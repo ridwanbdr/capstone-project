@@ -1,13 +1,18 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  </head>
-  <body>
-    <h1 class="text-3xl font-bold underline">
-      Hello world!
-    </h1>
-  </body>
-</html>
+@extends('layouts.main')
+
+@section('title', 'Home')
+
+@section('content')
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="text-3xl font-bold underline">
+                        Welcome to UMKM Application
+                    </h1>
+                    <p class="mt-4">This is your Laravel application with Modernize admin template.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
