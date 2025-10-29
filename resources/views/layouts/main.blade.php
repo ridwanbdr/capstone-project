@@ -45,7 +45,7 @@
               <span class="hide-menu">UI COMPONENTS</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{{ route('ui-buttons') }}" aria-expanded="false">
+              <a class="sidebar-link" href="#" aria-expanded="false">
                 <span>
                   <i class="ti ti-article"></i>
                 </span>
@@ -53,7 +53,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{{ route('ui-alerts') }}" aria-expanded="false">
+              <a class="sidebar-link" href="#" aria-expanded="false">
                 <span>
                   <i class="ti ti-alert-circle"></i>
                 </span>
@@ -61,7 +61,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{{ route('ui-card') }}" aria-expanded="false">
+              <a class="sidebar-link" href="#" aria-expanded="false">
                 <span>
                   <i class="ti ti-cards"></i>
                 </span>
@@ -69,7 +69,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{{ route('ui-forms') }}" aria-expanded="false">
+              <a class="sidebar-link" href="#" aria-expanded="false">
                 <span>
                   <i class="ti ti-file-description"></i>
                 </span>
@@ -77,7 +77,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{{ route('ui-typography') }}" aria-expanded="false">
+              <a class="sidebar-link" href="#" aria-expanded="false">
                 <span>
                   <i class="ti ti-typography"></i>
                 </span>
@@ -89,7 +89,7 @@
               <span class="hide-menu">AUTH</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{{ route('login') }}" aria-expanded="false">
+              <a class="sidebar-link" href="#" aria-expanded="false">
                 <span>
                   <i class="ti ti-login"></i>
                 </span>
@@ -97,7 +97,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{{ route('register') }}" aria-expanded="false">
+              <a class="sidebar-link" href="#" aria-expanded="false">
                 <span>
                   <i class="ti ti-user-plus"></i>
                 </span>
@@ -109,7 +109,7 @@
               <span class="hide-menu">EXTRA</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{{ route('icons') }}" aria-expanded="false">
+              <a class="sidebar-link" href="#" aria-expanded="false">
                 <span>
                   <i class="ti ti-mood-happy"></i>
                 </span>
@@ -117,7 +117,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{{ route('sample-page') }}" aria-expanded="false">
+              <a class="sidebar-link" href="#" aria-expanded="false">
                 <span>
                   <i class="ti ti-aperture"></i>
                 </span>
