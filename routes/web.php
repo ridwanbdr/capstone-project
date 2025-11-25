@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\RawStockController;
 
 Route::get('/', [HomeController::class, 'index'])->name('dashboard');
 
@@ -13,4 +14,5 @@ Route::get('/register', [HomeController::class, 'register'])->name('register');
 Route::get('/logout', [HomeController::class, 'logout'])->name('logout');
 
 // Other routes
-Route::get('/icons', [HomeController::class, 'menu1'])->name('menu1');
+Route::get('/raw_stock', [RawStockController::class, 'index'])->name('raw_stock.index');
+Route::resource('raw_stock', RawStockController::class);
