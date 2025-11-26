@@ -41,7 +41,7 @@
               </a>
             </li>
 
-            {{-- New Menu --}}
+            {{-- Menu --}}
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">Menu</span>
@@ -61,9 +61,10 @@
                 <span>
                   <i class="ti ti-cards"></i>
                 </span>
-                <span class="hide-menu">Production</span>
+                <span class="hide-menu">Procution</span>
               </a>
             </li>
+
 
           </ul>
         </nav>
@@ -120,7 +121,7 @@
         </nav>
       </header>
       <!--  Header End -->
-      <div class="container-fluid">
+      <div class="container-fluid b">
         @yield('content')
       </div>
     </div>
