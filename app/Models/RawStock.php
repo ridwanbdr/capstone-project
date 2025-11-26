@@ -15,6 +15,8 @@ class RawStock extends Model
     protected $fillable = [
         'material_name',
         'material_qty',
+        'satuan',
+        'category',
         'unit_price',
         'total_price',
         'added_on',
@@ -23,6 +25,8 @@ class RawStock extends Model
     protected $casts = [
         'added_on' => 'date',
         'material_qty' => 'integer',
+        'satuan' => 'string',
+        'category' => 'string',
         'unit_price' => 'integer',
         'total_price' => 'integer',
     ];

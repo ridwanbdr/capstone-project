@@ -41,7 +41,9 @@ class RawStockController extends Controller
         // Validasi input dengan pesan error kustom
         $validated = $request->validate([
             'material_name' => 'required|string|max:255',
-            'material_qty' => 'required|integer|min:0',
+            'material_qty' => 'required|integer|min:0', 
+            'satuan' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
             'unit_price' => 'required|integer|min:0',
             'added_on' => 'required|date',
         ], [
@@ -51,6 +53,12 @@ class RawStockController extends Controller
             'material_qty.required' => 'Jumlah material wajib diisi',
             'material_qty.integer' => 'Jumlah material harus berupa angka',
             'material_qty.min' => 'Jumlah material tidak boleh kurang dari 0',
+            'satuan.required' => 'Satuan material wajib diisi',
+            'satuan.string' => 'Satuan material harus berupa teks',
+            'satuan.max' => 'Satuan material maksimal 255 karakter',
+            'category.required' => 'Kategori material wajib diisi',
+            'category.string' => 'Kategori material harus berupa teks',
+            'category.max' => 'Kategori material maksimal 255 karakter',
             'unit_price.required' => 'Harga per unit wajib diisi',
             'unit_price.integer' => 'Harga per unit harus berupa angka',
             'unit_price.min' => 'Harga per unit tidak boleh kurang dari 0',
@@ -64,6 +72,8 @@ class RawStockController extends Controller
             RawStock::create([
                 'material_name' => $validated['material_name'],
                 'material_qty' => $validated['material_qty'],
+                'satuan' => $validated['satuan'],
+                'category' => $validated['category'],
                 'unit_price' => $validated['unit_price'],
                 'total_price' => $total_price,
                 'added_on' => $validated['added_on'],
@@ -104,6 +114,8 @@ class RawStockController extends Controller
         $validated = $request->validate([
             'material_name' => 'required|string|max:255',
             'material_qty' => 'required|integer|min:0',
+            'satuan' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
             'unit_price' => 'required|integer|min:0',
             'added_on' => 'required|date',
         ], [
@@ -113,6 +125,12 @@ class RawStockController extends Controller
             'material_qty.required' => 'Jumlah material wajib diisi',
             'material_qty.integer' => 'Jumlah material harus berupa angka',
             'material_qty.min' => 'Jumlah material tidak boleh kurang dari 0',
+            'satuan.required' => 'Satuan material wajib diisi',
+            'satuan.string' => 'Satuan material harus berupa teks',
+            'satuan.max' => 'Satuan material maksimal 255 karakter',
+            'category.required' => 'Kategori material wajib diisi',
+            'category.string' => 'Kategori material harus berupa teks',
+            'category.max' => 'Kategori material maksimal 255 karakter',
             'unit_price.required' => 'Harga per unit wajib diisi',
             'unit_price.integer' => 'Harga per unit harus berupa angka',
             'unit_price.min' => 'Harga per unit tidak boleh kurang dari 0',
@@ -128,8 +146,10 @@ class RawStockController extends Controller
             $stock->update([
                 'material_name' => $validated['material_name'],
                 'material_qty' => $validated['material_qty'],
+                'satuan' => $validated['satuan'],
+                'category' => $validated['category'],
                 'unit_price' => $validated['unit_price'],
-                'total_price' => $total_price,
+                'total_price' => $total_price,                
                 'added_on' => $validated['added_on'],
             ]);
 

@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id('material_id');
             $table->string('material_name');
             $table->integer('material_qty');
+            $table->string('satuan');
+            $table->string('category');
             $table->integer('unit_price');
             $table->integer('total_price');
             $table->date('added_on');

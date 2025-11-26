@@ -2,7 +2,7 @@
     <div class="card w-100">
         <div class="card-body p-4">
             <div class="table-responsive">
-                <table class="table table-hover text-nowrap mb-0 align-middle">
+                <table class="table table-hover table-bordered text-nowrap text-center mb-0 align-middle">
                     <thead class="text-dark fs-4">
                         <tr>
                         <th class="border-bottom-0">
@@ -15,13 +15,19 @@
                             <h6 class="fw-semibold mb-0">Quantity</h6>
                         </th>
                         <th class="border-bottom-0">
+                            <h6 class="fw-semibold mb-0">Satuan</h6>
+                        </th>                        
+                        <th class="border-bottom-0">
+                            <h6 class="fw-semibold mb-0">Kategori</h6>
+                        </th>
+                        <th class="border-bottom-0">
                             <h6 class="fw-semibold mb-0">Harga Satuan</h6>
                         </th>
                         <th class="border-bottom-0">
                             <h6 class="fw-semibold mb-0">Total Harga</h6>
                         </th>
                         <th class="border-bottom-0">
-                            <h6 class="fw-semibold mb-0">Aksi</h6>
+                            <h6 class="fw-semibold mb-0 text-center">Aksi</h6>
                         </th>
                         </tr>
                     </thead>
@@ -43,6 +49,16 @@
                                 <h6 class="fw-semibold mb-0">{{ $stock->material_qty }}</h6>
                             </td>
 
+                            <!-- Satuan -->
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">{{ $stock->satuan }}</h6>
+                            </td>
+
+                            <!-- Kategori -->
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">{{ $stock->category }}</h6>
+                            </td>
+
                             <!-- Harga Satuan -->
                             <td class="border-bottom-0">
                                 <h6 class="fw-semibold mb-0">{{ number_format($stock->unit_price) }}</h6>
@@ -53,7 +69,7 @@
                                 <h6 class="fw-semibold mb-0">{{ number_format($stock->material_qty * $stock->unit_price) }}</h6>
                             </td>
 
-                            <td class="border-bottom-0">
+                            <td class="border-bottom-0 text-center">
                                 {{-- Delete form (tidak mengandung modal) --}}
                                 <form action="{{ route('raw_stock.destroy', $stock->material_id) }}" method="POST" style="display:inline">
                                     @csrf
@@ -74,7 +90,7 @@
                                                 <h1 class="modal-title fs-5" id="editModalLabel{{ $stock->material_id }}">Edit Raw Material</h1>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <div class="modal-body">
+                                            <div class="modal-body text-start">
                                                 <form action="{{ route('raw_stock.update', ['raw_stock' => $stock->material_id]) }}" method="POST">
                                                     @csrf
                                                     @method('PUT')
@@ -83,8 +99,30 @@
                                                         <input name="material_name" required type="text" class="form-control" id="materialName{{ $stock->material_id }}" value="{{ old('material_name', $stock->material_name) }}">
                                                     </div>
                                                     <div class="mb-3">
+                                                        <label for="category{{ $stock->material_id }}" class="col-form-label">Kategori:</label>
+                                                        <select name="category" class="form-control" required>
+                                                            <option value="">-- Pilih Kategori --</option>
+                                                            <option value="Kain Utama">Kain Utama</option>
+                                                            <option value="Benang">Benang</option>
+                                                            <option value="Aksesoris">Aksesoris</option>
+                                                            <option value="Bahan pelengkap">Bahan pelengkap</option>
+                                                            <option value="Bahan kemasan">Bahan kemasan</option>
+                                                            <option value="Bahan lainnya">Bahan lainnya</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
                                                         <label for="materialQty{{ $stock->material_id }}" class="col-form-label">Quantity:</label>
                                                         <input name="material_qty" required type="number" min="0" class="form-control" id="materialQty{{ $stock->material_id }}" value="{{ old('material_qty', $stock->material_qty) }}">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="satuan{{ $stock->material_id }}" class="col-form-label">Satuan:</label>
+                                                        <select name="satuan" class="form-control" required>
+                                                            <option value="">-- Pilih Satuan --</option>
+                                                            <option value="pcs">Pcs</option>
+                                                            <option value="roll">Roll</option>
+                                                            <option value="kg">Kg</option>
+                                                            <option value="meter">Meter</option>
+                                                        </select>
                                                     </div>
                                                     <div class="mb-3">
                                                         <label for="unitPrice{{ $stock->material_id }}" class="col-form-label">Harga Satuan:</label>
