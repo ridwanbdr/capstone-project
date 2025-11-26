@@ -3,19 +3,19 @@
         <thead class="table-light text-center">
             <tr>
                 <th class="ps-4">
-                    <span class="fw-semibold text-dark">Tanggal</span>
+                    <span class="fw-semibold text-dark">Tanggal Produksi</span>
                 </th>
                 <th>
-                    <span class="fw-semibold text-dark">Production Lead</span>
+                    <span class="fw-semibold text-dark">Tim Produksi</span>
                 </th>
                 <th>
                     <span class="fw-semibold text-dark">Label</span>
                 </th>
                 <th>
-                    <span class="fw-semibold text-dark">Materials</span>
+                    <span class="fw-semibold text-dark">Bahan Baku</span>
                 </th>
                 <th class="text-center">
-                    <span class="fw-semibold text-dark">Total Qty Material</span>
+                    <span class="fw-semibold text-dark">Total Bahan Baku</span>
                 </th>
                 <th class="text-center">
                     <span class="fw-semibold text-dark">Total Unit</span>
@@ -92,7 +92,7 @@
                     <div class="modal-content border-0 shadow-lg">
                         <div class="modal-header bg-primary border-0">
                             <h5 class="modal-title text-white fw-semibold" id="editModalLabel{{ $production->production_id }}">
-                                <i class="ti ti-edit me-2"></i>Edit Production
+                                <i class="ti ti-edit me-2"></i>Edit Produksi
                             </h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
@@ -101,20 +101,20 @@
                                 @csrf
                                 @method('PUT')
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold">Production Lead</label>
+                                    <label class="form-label fw-semibold">Tim Produksi</label>
                                     <input name="production_lead" required type="text" class="form-control" value="{{ old('production_lead', $production->production_lead) }}">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold">Production Label</label>
+                                    <label class="form-label fw-semibold">Label Produksi</label>
                                     <input name="production_label" required type="text" class="form-control" value="{{ old('production_label', $production->production_label) }}">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold">Tanggal Production</label>
+                                    <label class="form-label fw-semibold">Tanggal Produksi</label>
                                     <input name="production_date" required type="date" class="form-control" value="{{ old('production_date', $production->production_date) }}">
                                 </div>
                                 <div class="mb-3">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="form-label fw-semibold mb-0">Materials</label>
+                                        <label class="form-label fw-semibold mb-0">Bahan Baku</label>
                                         <button type="button" class="btn btn-sm btn-success add-material-edit" data-production-id="{{ $production->production_id }}">
                                             <i class="ti ti-plus"></i> Tambah
                                         </button>
@@ -126,7 +126,7 @@
                                                     <div class="row g-2">
                                                         <div class="col-md-6">
                                                             <select name="materials[{{ $index }}][material_id]" class="form-select form-select-sm" required>
-                                                                <option value="">-- Pilih Material --</option>
+                                                                <option value="">-- Pilih Bahan Baku --</option>
                                                                 @foreach($rawStocks ?? [] as $stock)
                                                                     <option value="{{ $stock->material_id }}" {{ $rawStock->material_id == $stock->material_id ? 'selected' : '' }}>
                                                                         {{ $stock->material_name }} (Stok: {{ $stock->material_qty }} {{ $stock->satuan }})
@@ -150,7 +150,7 @@
                                                 <div class="row g-2">
                                                     <div class="col-md-6">
                                                         <select name="materials[0][material_id]" class="form-select form-select-sm" required>
-                                                            <option value="">-- Pilih Material --</option>
+                                                            <option value="">-- Pilih Bahan Baku --</option>
                                                             @foreach($rawStocks ?? [] as $stock)
                                                                 <option value="{{ $stock->material_id }}">
                                                                     {{ $stock->material_name }} (Stok: {{ $stock->material_qty }} {{ $stock->satuan }})

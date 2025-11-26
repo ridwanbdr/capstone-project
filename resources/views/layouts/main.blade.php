@@ -52,7 +52,7 @@
                 <span>
                   <i class="ti ti-article"></i>
                 </span>
-                <span class="hide-menu">Raw Stock Material</span>
+                <span class="hide-menu">Bahan Baku</span>
               </a>
             </li>
 
@@ -61,7 +61,7 @@
                 <span>
                   <i class="ti ti-cards"></i>
                 </span>
-                <span class="hide-menu">Procution</span>
+                <span class="hide-menu">Produksi</span>
               </a>
             </li>
 

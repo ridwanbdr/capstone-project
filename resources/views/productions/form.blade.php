@@ -4,7 +4,7 @@
         <div class="col-lg-6">
             <div class="mb-3">
                 <label for="production_lead" class="form-label fw-semibold">
-                    <i class="ti ti-user me-1 text-primary"></i>Production Lead
+                    <i class="ti ti-user me-1 text-primary"></i>Kepala Tim Produksi
                 </label>
                 <input type="text"
                        name="production_lead"
@@ -22,7 +22,7 @@
 
             <div class="mb-3">
                 <label for="production_label" class="form-label fw-semibold">
-                    <i class="ti ti-note me-1 text-primary"></i>Production Label
+                    <i class="ti ti-note me-1 text-primary"></i>Label Produksi
                 </label>
                 <input type="text"
                        name="production_label"
@@ -40,7 +40,7 @@
 
             <div class="mb-3">
                 <label for="production_date" class="form-label fw-semibold">
-                    <i class="ti ti-calendar-event me-1 text-primary"></i>Tanggal Production
+                    <i class="ti ti-calendar-event me-1 text-primary"></i>Tanggal Produksi
                 </label>
                 <input type="date"
                        name="production_date"
@@ -78,10 +78,10 @@
         <div class="col-lg-6">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <label class="form-label fw-semibold mb-0">
-                    <i class="ti ti-layers-linked me-1 text-primary"></i>Daftar Materials
+                    <i class="ti ti-layers-linked me-1 text-primary"></i>Daftar Bahan Baku
                 </label>
                 <button type="button" class="btn btn-sm btn-success" id="addMaterialBtn">
-                    <i class="ti ti-plus"></i> Tambah Material
+                    <i class="ti ti-plus"></i> Tambah Bahan Baku
                 </button>
             </div>
 
@@ -107,7 +107,7 @@
                     <i class="ti ti-refresh"></i> Reset
                 </button>
                 <button type="submit" class="btn btn-primary px-5 shadow-sm">
-                    <i class="ti ti-cloud-upload"></i> Simpan Production
+                    <i class="ti ti-cloud-upload"></i> Simpan Produksi
                 </button>
             </div>
         </div>
