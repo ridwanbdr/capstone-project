@@ -149,6 +149,10 @@
                     </tbody>
                 </table>
             </div>
+            {{-- Pagination links --}}
+            <div class="d-flex justify-content-center mt-4">
+                {{ $stocks->links() }}
+            </div>
         </div>
     </div>
 </div>
