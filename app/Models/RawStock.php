@@ -30,4 +30,45 @@ class RawStock extends Model
         'unit_price' => 'integer',
         'total_price' => 'integer',
     ];
+    
+    /**
+     * Relasi many-to-many ke Production melalui pivot table production_materials
+     */
+    public function productions()
+    {
+        return $this->belongsToMany(Production::class, 'production_materials', 'material_id', 'production_id')
+                    ->withPivot('material_qty')
+                    ->withTimestamps();
+    }
+    
+    /**
+     * Mengurangi quantity raw stock
+     * 
+     * @param int $qty Jumlah yang akan dikurangi
+     * @return bool
+     * @throws \Exception Jika qty tidak cukup
+     */
+    public function reduceQty($qty)
+    {
+        if ($this->material_qty < $qty) {
+            throw new \Exception("Stok tidak cukup. Stok tersedia: {$this->material_qty}, dibutuhkan: {$qty}");
+        }
+        
+        $this->material_qty -= $qty;
+        $this->total_price = $this->material_qty * $this->unit_price;
+        return $this->save();
+    }
+    
+    /**
+     * Menambah quantity raw stock
+     * 
+     * @param int $qty Jumlah yang akan ditambahkan
+     * @return bool
+     */
+    public function addQty($qty)
+    {
+        $this->material_qty += $qty;
+        $this->total_price = $this->material_qty * $this->unit_price;
+        return $this->save();
+    }
 }

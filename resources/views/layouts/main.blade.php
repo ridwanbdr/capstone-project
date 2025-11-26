@@ -46,6 +46,7 @@
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">Menu</span>
             </li>
+
             <li class="sidebar-item">
               <a class="sidebar-link" href="{{ route('raw_stock.index') }}" aria-expanded="false">
                 <span>
@@ -54,6 +55,16 @@
                 <span class="hide-menu">Raw Stock Material</span>
               </a>
             </li>
+
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{{ route('production.index') }}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-cards"></i>
+                </span>
+                <span class="hide-menu">Production</span>
+              </a>
+            </li>
+
           </ul>
         </nav>
         <!-- End Sidebar navigation -->
