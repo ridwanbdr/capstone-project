@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Production extends Model
 {
@@ -16,7 +17,8 @@ class Production extends Model
         'production_lead',
         'production_label',
         'production_date',
-        'total_unit'
+        'total_unit',
+        'product_name'
     ];
     
     protected $casts = [
@@ -35,4 +37,13 @@ class Production extends Model
                     ->withPivot('material_qty')
                     ->withTimestamps();
     }
+
+    /**
+     * Get the QcCheck records for this production.
+     */
+    public function qcChecks(): HasMany
+    {
+        return $this->hasMany(QcCheck::class, 'product_name', 'product_name');
+    }
 }
+

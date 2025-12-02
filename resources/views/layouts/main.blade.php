@@ -65,6 +65,15 @@
               </a>
             </li>
 
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{{ route('qc_check.index') }}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-checkbox"></i>
+                </span>
+                <span class="hide-menu">Quality Control</span>
+              </a>
+            </li>
+
 
           </ul>
         </nav>
@@ -112,7 +121,10 @@
                       <i class="ti ti-list-check fs-6"></i>
                       <p class="mb-0 fs-3">My Task</p>
                     </a>
-                    <a href="{{ route('logout') }}" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
+                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                      @csrf
+                      <button type="submit" class="btn btn-outline-primary mx-3 mt-2 d-block w-100" style="border: none; background: none;">Logout</button>
+                    </form>
                   </div>
                 </div>
               </li>

@@ -39,17 +39,14 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
     
     /**
      * Boot the model and set up the user_id generation.
@@ -116,5 +113,13 @@ class User extends Authenticatable
     public function transaksi(): HasMany
     {
         return $this->hasMany(Transaksi::class, 'user_id');
+    }
+    
+    /**
+     * Get the QcCheck records for the user.
+     */
+    public function qcChecks(): HasMany
+    {
+        return $this->hasMany(QcCheck::class, 'qc_checker', 'user_id');
     }
 }
