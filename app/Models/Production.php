@@ -3,15 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\DetailProduct;
 
 class Production extends Model
 {
     protected $table = 'productions';
-    
     protected $primaryKey = 'production_id';
-    
     public $incrementing = true;
-    
     protected $fillable = [
         'production_lead',
         'production_label',
@@ -34,5 +32,11 @@ class Production extends Model
         return $this->belongsToMany(RawStock::class, 'production_materials', 'production_id', 'material_id')
                     ->withPivot('material_qty')
                     ->withTimestamps();
+    }
+
+    // relasi ke DetailProduct (one production has many detail products)
+    public function detailProducts()
+    {
+        return $this->hasMany(DetailProduct::class, 'production_id', 'production_id');
     }
 }

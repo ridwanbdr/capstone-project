@@ -25,6 +25,9 @@ class DatabaseSeeder extends Seeder
         // Seed raw stocks
         $this->call([
             RawStockSeeder::class,
+            SizeSeeder::class,
+            ProductionSeeder::class,
+            DetailProductSeeder::class
         ]);
     }
 }

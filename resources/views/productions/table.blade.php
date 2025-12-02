@@ -72,6 +72,14 @@
                                 data-bs-target="#editModal{{ $production->production_id }}">
                             <i class="ti ti-edit"></i>
                         </button>
+
+                        <!-- View button (mata) - navigasi ke halaman detail_product.index dengan production_id dan production_label -->
+                        <a href="{{ route('detail_product.index', ['production_id' => $production->production_id, 'production_label' => $production->production_label]) }}"
+                           class="btn btn-sm btn-outline-warning rounded-pill px-3"
+                           title="Lihat detail produk">
+                            <i class="ti ti-eye"></i>
+                        </a>
+
                         <form action="{{ route('production.destroy', $production->production_id) }}"
                               method="POST"
                               onsubmit="return confirm('Apakah Anda yakin ingin menghapus production ini? Stok material TIDAK akan dikembalikan.');">
@@ -184,6 +192,58 @@
                                     </button>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Modal View (readonly) --}}
+            <div class="modal fade" id="viewModal{{ $production->production_id }}" tabindex="-1" aria-labelledby="viewModalLabel{{ $production->production_id }}" aria-hidden="true">
+                <div class="modal-dialog modal-md modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg">
+                        <div class="modal-header bg-secondary border-0">
+                            <h5 class="modal-title text-white fw-semibold" id="viewModalLabel{{ $production->production_id }}">
+                                <i class="ti ti-eye me-2"></i>Detail Produksi
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Tanggal Produksi</label>
+                                <div class="form-control-plaintext">{{ $production->production_date ? \Carbon\Carbon::parse($production->production_date)->format('d M Y') : '-' }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Tim Produksi</label>
+                                <div class="form-control-plaintext">{{ $production->production_lead }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Label Produksi</label>
+                                <div class="form-control-plaintext">{{ $production->production_label }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Bahan Baku</label>
+                                @if($production->rawStocks && $production->rawStocks->count() > 0)
+                                    <ul class="list-unstyled mb-0">
+                                        @foreach($production->rawStocks as $rawStock)
+                                            <li class="d-flex justify-content-between text-muted">
+                                                <span>{{ $rawStock->material_name }}</span>
+                                                <small class="fw-semibold">{{ number_format($rawStock->pivot->material_qty) }} {{ $rawStock->satuan }}</small>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    <div class="text-muted">-</div>
+                                @endif
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Total Unit</label>
+                                <div class="form-control-plaintext">{{ number_format($production->total_unit) }}</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-3">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                <i class="ti ti-x"></i> Tutup
+                            </button>
                         </div>
                     </div>
                 </div>
