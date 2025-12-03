@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Size;
 use App\Models\Production;
 
@@ -39,5 +40,13 @@ class DetailProduct extends Model
     public function production()
     {
         return $this->belongsTo(Production::class, 'production_id', 'production_id');
+    }
+
+    /**
+     * Get the QC checks for this detail product.
+     */
+    public function qcChecks(): HasMany
+    {
+        return $this->hasMany(QcCheck::class, 'product_id', 'product_id');
     }
 }
