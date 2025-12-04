@@ -26,6 +26,7 @@ class QcCheck extends Model
         'date',
         'qc_checker',
         'qc_label',
+        'reject_reason',
     ];
 
     /**

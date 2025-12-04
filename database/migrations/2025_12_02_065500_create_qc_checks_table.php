@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('date');
             $table->string('qc_checker')->nullable();
             $table->string('qc_label')->nullable();
+            $table->text('reject_reason')->nullable();
             $table->timestamps();
 
             // Foreign keys

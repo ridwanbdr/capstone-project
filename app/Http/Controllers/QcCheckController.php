@@ -37,12 +37,26 @@ class QcCheckController extends Controller
             'qty_reject' => 'required|integer|min:0',
             'date' => 'required|date',
             'qc_checker' => 'nullable|string',
+            'reject_reason' => 'nullable|string',
         ]);
 
+        // Get detail product and its production info
+        $detailProduct = DetailProduct::find($validated['product_id']);
+        $production = $detailProduct->production;
+
+        // Validate total qty must equal production total_unit
+        $total_qty = $validated['qty_passed'] + $validated['qty_reject'];
+        if ($total_qty != $production->total_unit) {
+            return back()
+                ->withErrors([
+                    'qty_passed' => "Total barang lolos + reject ({$total_qty}) harus sama dengan total unit produksi ({$production->total_unit})"
+                ])
+                ->withInput();
+        }
+
         // Calculate pass rate and determine status
-        $total = $validated['qty_passed'] + $validated['qty_reject'];
-        if ($total > 0) {
-            $passRate = ($validated['qty_passed'] / $total) * 100;
+        if ($total_qty > 0) {
+            $passRate = ($validated['qty_passed'] / $total_qty) * 100;
             $validated['qc_label'] = $passRate >= 95 ? 'PASS' : 'FAIL';
         } else {
             $validated['qc_label'] = 'PENDING';
@@ -73,12 +87,26 @@ class QcCheckController extends Controller
             'qty_reject' => 'required|integer|min:0',
             'date' => 'required|date',
             'qc_checker' => 'nullable|string',
+            'reject_reason' => 'nullable|string',
         ]);
 
+        // Get detail product and its production info
+        $detailProduct = DetailProduct::find($validated['product_id']);
+        $production = $detailProduct->production;
+
+        // Validate total qty must equal production total_unit
+        $total_qty = $validated['qty_passed'] + $validated['qty_reject'];
+        if ($total_qty != $production->total_unit) {
+            return back()
+                ->withErrors([
+                    'qty_passed' => "Total barang lolos + reject ({$total_qty}) harus sama dengan total unit produksi ({$production->total_unit})"
+                ])
+                ->withInput();
+        }
+
         // Calculate pass rate and determine status
-        $total = $validated['qty_passed'] + $validated['qty_reject'];
-        if ($total > 0) {
-            $passRate = ($validated['qty_passed'] / $total) * 100;
+        if ($total_qty > 0) {
+            $passRate = ($validated['qty_passed'] / $total_qty) * 100;
             $validated['qc_label'] = $passRate >= 95 ? 'PASS' : 'FAIL';
         } else {
             $validated['qc_label'] = 'PENDING';
