@@ -74,15 +74,27 @@ class DetailProductController extends Controller
             'production_id'    => 'required|integer|exists:productions,production_id',
             'product_name'     => 'required|string|max:255',
             'size_id'          => 'required|integer|exists:size,size_id',
-            'qty_unit'         => 'nullable|integer|min:0',
-            'price_unit'       => 'nullable|integer|min:0',
+            'qty_unit'         => 'required|integer|min:1',
+            'price_unit'       => 'required|integer|min:1',
         ]);
 
-        DetailProduct::create($validated);
+        $incomingQty = (int) $validated['qty_unit'];
+        $priceUnit = (int) $validated['price_unit'];
 
-        // get production_label from productions table to preserve on redirect
         $production = Production::find($validated['production_id']);
+        $totalUnitLimit = $production ? (int) $production->total_unit : 0;
         $productionLabel = $production ? $production->production_label : null;
+
+        $currentTotal = (int) DetailProduct::where('production_id', $validated['production_id'])->sum('qty_unit');
+
+        if ($currentTotal + $incomingQty > $totalUnitLimit) {
+            return redirect()->route('detail_product.index', [
+                'production_id' => $validated['production_id'],
+                'production_label' => $productionLabel,
+            ])->withInput()->with('error', 'Gagal input! Kuantitas melebihi batas');
+        }
+
+        DetailProduct::create($validated);
 
         return redirect()->route('detail_product.index', [
             'production_id' => $validated['production_id'],
@@ -118,16 +130,30 @@ class DetailProductController extends Controller
             'production_id'    => 'required|integer|exists:productions,production_id',
             'product_name'     => 'required|string|max:255',
             'size_id'          => 'required|integer|exists:size,size_id',
-            'qty_unit'         => 'nullable|integer|min:0',
-            'price_unit'       => 'nullable|integer|min:0',
+            'qty_unit'         => 'required|integer|min:1',
+            'price_unit'       => 'required|integer|min:1',
         ]);
 
-        $detailProduct = DetailProduct::findOrFail($id);
-        $detailProduct->update($validated);
+        $incomingQty = (int) $validated['qty_unit'];
 
-        // get production_label from productions table to preserve on redirect
+        $detailProduct = DetailProduct::findOrFail($id);
+
         $production = Production::find($validated['production_id']);
+        $totalUnitLimit = $production ? (int) $production->total_unit : 0;
         $productionLabel = $production ? $production->production_label : null;
+
+        $currentTotalExcluding = (int) DetailProduct::where('production_id', $validated['production_id'])
+            ->where('product_id', '!=', $id)
+            ->sum('qty_unit');
+
+        if ($currentTotalExcluding + $incomingQty > $totalUnitLimit) {
+            return redirect()->route('detail_product.index', [
+                'production_id' => $validated['production_id'],
+                'production_label' => $productionLabel,
+            ])->withInput()->with('error', 'Gagal input! Kuantitas melebihi batas');
+        }
+
+        $detailProduct->update($validated);
 
         return redirect()->route('detail_product.index', [
             'production_id' => $validated['production_id'],

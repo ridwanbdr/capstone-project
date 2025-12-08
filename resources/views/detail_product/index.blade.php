@@ -51,6 +51,10 @@
                         </div>
                         <div class="col-lg-6">
                             <form action="{{ route('detail_product.index') }}" method="GET" class="d-flex gap-2">
+                                {{-- keep production_id + production_label in search requests --}}
+                                <input type="hidden" name="production_id" value="{{ request('production_id') ?? (isset($productionLabel) && !empty(request('production_id')) ? request('production_id') : request()->query('production_id')) }}">
+                                <input type="hidden" name="production_label" value="{{ request('production_label') ?? $productionLabel ?? '' }}">
+
                                 <div class="input-group flex-grow-1">
                                     <span class="input-group-text bg-light border-end-0">
                                         <i class="ti ti-search"></i>
@@ -65,7 +69,7 @@
                                     <i class="ti ti-search"></i> Cari
                                 </button>
                                 @if(request('search'))
-                                    <a href="{{ route('detail_product.index') }}" class="btn btn-outline-secondary">
+                                    <a href="{{ route('detail_product.index', ['production_id' => request('production_id'), 'production_label' => request('production_label')]) }}" class="btn btn-outline-secondary">
                                         <i class="ti ti-x"></i> Reset
                                     </a>
                                 @endif

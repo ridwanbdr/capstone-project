@@ -16,25 +16,36 @@
                 </div>
             @endif
 
-            {{-- Production ID (from route) - readonly, included as hidden input --}}
+            {{-- Production ID (from route) - readonly, included as input so browser validation can run --}}
             <div class="mb-3">
                 <label class="form-label fw-semibold">
                     <i class="ti ti-building-factory me-1 text-primary"></i>Production ID
                 </label>
-                <div class="form-control-plaintext">
-                    {{ old('production_id', $detailProduct->production_id ?? request()->route('production_id') ?? request('production_id') ?? '-') }}
-                </div>
-                <input type="hidden" name="production_id" value="{{ old('production_id', $detailProduct->production_id ?? request()->route('production_id') ?? request('production_id') ?? '') }}">
+                <input type="text"
+                       name="production_id"
+                       class="form-control form-control-plaintext @error('production_id') is-invalid @enderror"
+                       readonly
+                       required
+                       value="{{ old('production_id', $detailProduct->production_id ?? request()->route('production_id') ?? request('production_id') ?? '') }}">
+                @error('production_id')
+                    <div class="text-danger small mt-1"><i class="ti ti-alert-circle me-1"></i>{{ $message }}</div>
+                @enderror
             </div>
 
-            {{-- Production Label (from route/query) - readonly, NOT submitted --}}
+            {{-- Production Label (from route/query) - readonly input, submitted --}}
             <div class="mb-3">
                 <label class="form-label fw-semibold">
                     <i class="ti ti-note me-1 text-primary"></i>Production Label
                 </label>
-                <div class="form-control-plaintext">
-                    {{ old('production_label', $detailProduct->production_label ?? ($productionLabel ?? request('production_label')) ?? '-') }}
-                </div>
+                <input type="text"
+                       name="production_label"
+                       class="form-control form-control-plaintext @error('production_label') is-invalid @enderror"
+                       readonly
+                       required
+                       value="{{ old('production_label', $detailProduct->production_label ?? ($productionLabel ?? request('production_label')) ?? '') }}">
+                @error('production_label')
+                    <div class="text-danger small mt-1"><i class="ti ti-alert-circle me-1"></i>{{ $message }}</div>
+                @enderror
             </div>
 
             {{-- Product Name --}}
@@ -88,9 +99,9 @@
                            name="qty_unit"
                            id="qty_unit"
                            class="form-control @error('qty_unit') is-invalid @enderror"
-                           placeholder="0"
-                           value="{{ old('qty_unit', $detailProduct->qty_unit ?? 0) }}"
-                           min="0">
+                           value="{{ old('qty_unit', $detailProduct->qty_unit ?? '') }}"
+                           min="1"
+                           required>
                     @error('qty_unit')
                         <div class="text-danger small mt-1"><i class="ti ti-alert-circle me-1"></i>{{ $message }}</div>
                     @enderror
@@ -104,9 +115,10 @@
                            name="price_unit"
                            id="price_unit"
                            class="form-control @error('price_unit') is-invalid @enderror"
-                           placeholder="0"
-                           value="{{ old('price_unit', $detailProduct->price_unit ?? 0) }}"
-                           min="0" step="1">
+                           value="{{ old('price_unit', $detailProduct->price_unit ?? '') }}"
+                           min="1"
+                           step="1"
+                           required>
                     @error('price_unit')
                         <div class="text-danger small mt-1"><i class="ti ti-alert-circle me-1"></i>{{ $message }}</div>
                     @enderror
