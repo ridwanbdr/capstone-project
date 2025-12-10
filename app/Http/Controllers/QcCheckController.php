@@ -15,7 +15,8 @@ class QcCheckController extends Controller
     public function index()
     {
         $qcChecks = QcCheck::with(['detailProduct'])->paginate(10);
-        return view('qc_check.index', compact('qcChecks'));
+        $detailProducts = DetailProduct::with('production')->get();
+        return view('qc_check.index', compact('qcChecks', 'detailProducts'));
     }
 
     /**
