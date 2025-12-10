@@ -30,4 +30,12 @@ class Size extends Model
     {
         return $this->hasMany(DetailProduct::class, 'size_id', 'size_id');
     }
+
+    /**
+     * AvailStocks related to this size.
+     */
+    public function availStocks()
+    {
+        return $this->hasMany(AvailStock::class, 'size_id', 'size_id');
+    }
 }

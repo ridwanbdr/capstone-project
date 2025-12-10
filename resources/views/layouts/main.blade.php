@@ -73,6 +73,15 @@
                 <span class="hide-menu">Quality Control</span>
               </a>
             </li>
+            
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{{ route('transactions.index') }}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-credit-card"></i>
+                </span>
+                <span class="hide-menu">Transaksi</span>
+              </a>
+            </li>
 
         </nav>
         <!-- End Sidebar navigation -->

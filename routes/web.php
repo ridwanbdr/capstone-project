@@ -6,6 +6,7 @@ use App\Http\Controllers\RawStockController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\DetailProductController;
 use App\Http\Controllers\QcCheckController;
+use App\Http\Controllers\TransactionController;
 
 Route::get('/', [HomeController::class, 'index'])->name('dashboard');
 
@@ -21,6 +22,9 @@ Route::post('/logout', [HomeController::class, 'logout'])->name('logout');
 Route::resource('raw_stock', RawStockController::class);
 Route::resource('production', ProductionController::class);
 Route::resource('qc_check', QcCheckController::class);
+
+// tambahkan route resource untuk transactions (tanpa menghapus baris lain)
+Route::resource('transactions', TransactionController::class);
 
 // DetailProduct routes
 Route::get('/detail_product/{production_id?}', [DetailProductController::class, 'index'])->name('detail_product.index');

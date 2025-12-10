@@ -60,7 +60,7 @@ class DetailProductSeeder extends Seeder
                         'product_name'  => $productName,
                         'size_id'       => $size->size_id,
                         'qty_unit'      => $qty,
-                        'price_unit'    => 0,
+                        'price_unit'    => 50000,
                     ]);
 
                     $remaining -= $qty;
