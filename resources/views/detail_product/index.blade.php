@@ -2,6 +2,31 @@
 @section('title', 'Detail Produk')
 
 @section('content')
+    <!-- Breadcrumb -->
+    <div class="row">
+        <div class="col-12">
+            @if(empty($production_id))
+                <div class="page-title-box d-flex align-items-center justify-content-between">
+                    <x-breadcrumb :breadcrumbs="[
+                        'Home' => route('dashboard'),
+                        'Produksi' => route('production.index'),
+                        'Detail Produk' => route('detail_product.index'),
+                        'Daftar Production' => '#'
+                    ]"/>
+                </div>
+            @else
+                <div class="page-title-box d-flex align-items-center justify-content-between">
+                    <x-breadcrumb :breadcrumbs="[
+                        'Home' => route('dashboard'),
+                        'Produksi' => route('production.index'),
+                        'Detail Produk' => route('detail_product.index'),
+                        $productionLabel => '#'
+                    ]"/>
+                </div>
+            @endif
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
             {{-- Alert Messages --}}

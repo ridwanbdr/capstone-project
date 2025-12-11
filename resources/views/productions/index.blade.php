@@ -2,6 +2,19 @@
 @section('title', 'Production')
 
 @section('content')
+    <!-- Breadcrumb -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-flex align-items-center justify-content-between">
+                <x-breadcrumb :breadcrumbs="[
+                    'Home' => route('dashboard'),
+                    'Produksi' => route('production.index'),
+                    'Daftar Production' => '#'
+                ]"/>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
 

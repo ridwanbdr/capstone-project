@@ -2,6 +2,19 @@
 @section('title', 'Transaksi')
 
 @section('content')
+    <!-- Breadcrumb -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-flex align-items-center justify-content-between">
+                <x-breadcrumb :breadcrumbs="[
+                    'Home' => route('dashboard'),
+                    'Transaksi' => route('transactions.index'),
+                    'Daftar Transaksi' => '#'
+                ]"/>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12 gap-3">
             {{-- Alert Messages --}}
