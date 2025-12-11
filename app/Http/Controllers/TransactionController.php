@@ -55,80 +55,80 @@ class TransactionController extends Controller
     public function store(Request $request)
     {
         DB::beginTransaction();
-         // jika avail stock tersedia, pastikan product_name & price di-merge ke request
-         if ($request->filled('id')) {
-             $avail = AvailStock::find($request->input('id'));
-             if ($avail) {
-                 $request->merge([
-                     'product_name' => $request->input('product_name') ?? $avail->product_name,
-                     // jika JS gagal mengisi price, ambil dari avail stock price_unit
-                     'price' => $request->input('price') ?? $avail->price_unit,
-                 ]);
-             }
-         }
- 
-         $validated = $request->validate([
-             'date' => 'required|date',
-             'id' => 'required|integer|exists:avail_stocks,id',
-             'product_name' => 'required|string|max:191', // { changed code }
-             'size' => 'nullable|string|max:100',
-             'qty' => 'required|integer|min:1',
-             'price' => 'required|numeric|min:0',
-             'paid' => 'nullable|numeric|min:0',
-             'payment_method' => 'nullable|string|max:100',
-             'due_date_payment' => 'nullable|date',
-             'status' => 'nullable|string|max:50',
-         ], [
-             'date.required' => 'Tanggal wajib diisi',
-             'id.required' => 'Referensi stok wajib dipilih',
-             'id.exists' => 'Referensi stok tidak ditemukan',
-             'qty.required' => 'Quantity wajib diisi',
-             'qty.integer' => 'Quantity harus berupa angka',
-             'price.required' => 'Harga satuan wajib diisi',
-             'price.numeric' => 'Harga harus berupa angka',
-             'product_name.required' => 'Nama produk wajib dipilih', // { changed code }
-         ]);
- 
-         try {
-            $validated['total'] = (int)$validated['qty'] * (float)$validated['price'];
-            $validated['paid'] = isset($validated['paid']) ? (float)$validated['paid'] : 0;
-            $validated['unpaid_amount'] = max(0, $validated['total'] - $validated['paid']);
 
-            // create transaction
-            $tx = Transaction::create($validated);
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'is_paid' => 'required|in:lunas,belum_lunas',
+            'paid' => 'nullable|numeric|min:0',
+            'payment_method' => 'nullable|string|max:100',
+            'due_date_payment' => 'nullable|date',
+            'status' => 'nullable|string|max:50',
+            'items' => 'required|array|min:1',
+            'items.*.id' => 'required|integer|exists:avail_stocks,id',
+            'items.*.qty' => 'required|integer|min:1',
+        ], [
+            'items.required' => 'Keranjang tidak boleh kosong.',
+            'items.*.id.required' => 'Produk wajib dipilih.',
+            'items.*.qty.required' => 'Jumlah produk wajib diisi.',
+        ]);
 
-            // reduce stock qty_unit on the corresponding avail stock (by id if present)
-            $availToUpdate = null;
+        try {
+            $date = $validated['date'];
+            $isPaid = $validated['is_paid'];
+            $paidInput = isset($validated['paid']) ? (float) $validated['paid'] : 0;
+            $paymentMethod = $validated['payment_method'] ?? null;
+            $dueDate = $validated['due_date_payment'] ?? null;
+            $status = $validated['status'] ?? null;
 
-            if (!empty($validated['id'])) {
-                $availToUpdate = AvailStock::find($validated['id']);
-            }
-            // fallback: find by product_name (shouldn't be necessary if id provided)
-            if (!$availToUpdate && !empty($validated['product_name'])) {
-                $availToUpdate = AvailStock::where('product_name', $validated['product_name'])->first();
-            }
-
-            if ($availToUpdate) {
-                // cek stok cukup
-                if ($availToUpdate->qty_unit < $validated['qty']) {
+            foreach ($validated['items'] as $item) {
+                $avail = AvailStock::find($item['id']);
+                if (!$avail) {
                     DB::rollBack();
-                    return redirect()->back()->with('error', 'Stok tidak cukup untuk produk ini.')->withInput();
+                    return back()->with('error', 'Produk tidak ditemukan.')->withInput();
                 }
 
-                $availToUpdate->qty_unit = max(0, $availToUpdate->qty_unit - $validated['qty']);
-                $availToUpdate->save();
+                $qty = (int) $item['qty'];
+                if ($avail->qty_unit < $qty) {
+                    DB::rollBack();
+                    return back()->with('error', "Stok tidak cukup untuk {$avail->product_name}. Tersedia: {$avail->qty_unit}")->withInput();
+                }
+
+                $price = (float) $avail->price_unit;
+                $total = $qty * $price;
+
+                $paid = $isPaid === 'lunas' ? $total : min($paidInput, $total);
+                $unpaid = max(0, $total - $paid);
+
+                Transaction::create([
+                    'date' => $date,
+                    'id' => $avail->id,
+                    'product_name' => $avail->product_name,
+                    'size' => $avail->size?->size_label,
+                    'qty' => $qty,
+                    'price' => $price,
+                    'total' => $total,
+                    'paid' => $paid,
+                    'payment_method' => $paymentMethod,
+                    'unpaid_amount' => $unpaid,
+                    'due_date_payment' => $isPaid === 'belum_lunas' ? $dueDate : null,
+                    'status' => $status ?? ($isPaid === 'lunas' ? 'dibayar' : 'pending'),
+                ]);
+
+                // kurangi stok
+                $avail->qty_unit = max(0, $avail->qty_unit - $qty);
+                $avail->save();
             }
 
             DB::commit();
             return redirect()->route('transactions.index')->with('success', 'Transaksi tersimpan.');
-         } catch (ValidationException $e) {
+        } catch (ValidationException $e) {
             DB::rollBack();
             throw $e;
-         } catch (Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage())->withInput();
-         }
-     }
+        }
+    }
 
     public function show($transaction_id)
     {
