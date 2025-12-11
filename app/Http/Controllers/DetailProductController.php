@@ -22,13 +22,37 @@ class DetailProductController extends Controller
             $production_id = $request->query('production_id', null);
         }
 
+        // Get all productions for card display
+        $productions = Production::orderBy('production_id', 'desc')->get();
+        
+        // Calculate product count and stats for each production
+        $productionStats = [];
+        foreach ($productions as $prod) {
+            $productCount = DetailProduct::where('production_id', $prod->production_id)->count();
+            $totalQty = (int) DetailProduct::where('production_id', $prod->production_id)->sum('qty_unit');
+            $totalUnitLimit = (int) $prod->total_unit;
+            $remainingUnit = max(0, $totalUnitLimit - $totalQty);
+            
+            $productionStats[$prod->production_id] = [
+                'product_count' => $productCount,
+                'total_qty' => $totalQty,
+                'total_limit' => $totalUnitLimit,
+                'remaining_unit' => $remainingUnit,
+                'percentage' => $totalUnitLimit > 0 ? round(($totalQty / $totalUnitLimit) * 100, 1) : 0
+            ];
+        }
+
+        // If no production_id selected, show production cards only
+        if (empty($production_id)) {
+            return view('detail_product.index', compact('productions', 'productionStats'));
+        }
+
+        // If production_id selected, show form and table for that production
         // eager load relations
         $query = DetailProduct::with(['size', 'production'])->orderBy('product_id', 'desc');
 
-        // enforce exact production_id filter first (if provided)
-        if (!is_null($production_id) && $production_id !== '') {
-            $query->where('production_id', $production_id);
-        }
+        // enforce exact production_id filter
+        $query->where('production_id', $production_id);
 
         // apply search (keeps production_id filter)
         if ($request->filled('search')) {
@@ -46,24 +70,14 @@ class DetailProductController extends Controller
         // sizes for dropdown ordered by id
         $sizes = Size::orderBy('size_id')->get();
 
-        // determine productionLabel: prefer query param, else lookup from productions table
-        $productionLabel = $request->query('production_label', null);
-        $production = null;
-        $totalUnitLimit = 0;
-        $currentTotal = 0;
-        $remainingUnit = 0;
-        
-        if (!empty($production_id)) {
-            $production = Production::find($production_id);
-            if ($production) {
-                $productionLabel = $productionLabel ?? $production->production_label;
-                $totalUnitLimit = (int) $production->total_unit;
-                $currentTotal = (int) DetailProduct::where('production_id', $production_id)->sum('qty_unit');
-                $remainingUnit = max(0, $totalUnitLimit - $currentTotal);
-            }
-        }
+        // Get production info
+        $production = Production::find($production_id);
+        $productionLabel = $production ? $production->production_label : null;
+        $totalUnitLimit = $production ? (int) $production->total_unit : 0;
+        $currentTotal = (int) DetailProduct::where('production_id', $production_id)->sum('qty_unit');
+        $remainingUnit = max(0, $totalUnitLimit - $currentTotal);
 
-        return view('detail_product.index', compact('detailProducts', 'sizes', 'productionLabel', 'production', 'totalUnitLimit', 'currentTotal', 'remainingUnit'));
+        return view('detail_product.index', compact('detailProducts', 'sizes', 'productionLabel', 'production', 'totalUnitLimit', 'currentTotal', 'remainingUnit', 'productions', 'productionStats', 'production_id'));
     }
 
     /**

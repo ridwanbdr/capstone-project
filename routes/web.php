@@ -28,5 +28,6 @@ Route::delete('/qc_check/production/{production}', [QcCheckController::class, 'd
 Route::resource('transactions', TransactionController::class);
 
 // DetailProduct routes
-Route::get('/detail_product/{production_id?}', [DetailProductController::class, 'index'])->name('detail_product.index');
+Route::get('/detail_product', [DetailProductController::class, 'index'])->name('detail_product.index');
+Route::get('/detail_product/production/{production_id}', [DetailProductController::class, 'index'])->name('detail_product.production');
 Route::resource('detail_product', DetailProductController::class)->except(['index']);

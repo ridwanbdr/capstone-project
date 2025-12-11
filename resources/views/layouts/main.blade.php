@@ -66,6 +66,15 @@
             </li>
 
             <li class="sidebar-item">
+              <a class="sidebar-link" href="{{ route('detail_product.index') }}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-package"></i>
+                </span>
+                <span class="hide-menu">Detail Produk</span>
+              </a>
+            </li>
+
+            <li class="sidebar-item">
               <a class="sidebar-link" href="{{ route('qc_check.index') }}" aria-expanded="false">
                 <span>
                   <i class="ti ti-checklist"></i>

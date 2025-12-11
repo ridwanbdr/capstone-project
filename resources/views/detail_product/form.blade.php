@@ -154,7 +154,7 @@
                            class="form-control form-control-plaintext @error('production_id') is-invalid @enderror"
                            readonly
                            required
-                           value="{{ old('production_id', request()->route('production_id') ?? request('production_id') ?? '') }}">
+                           value="{{ old('production_id', $production_id ?? request('production_id') ?? '') }}">
                     @error('production_id')
                         <div class="text-danger small mt-1"><i class="ti ti-alert-circle me-1"></i>{{ $message }}</div>
                     @enderror
