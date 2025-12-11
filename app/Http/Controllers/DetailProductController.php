@@ -48,12 +48,22 @@ class DetailProductController extends Controller
 
         // determine productionLabel: prefer query param, else lookup from productions table
         $productionLabel = $request->query('production_label', null);
-        if (empty($productionLabel) && !empty($production_id)) {
-            $prod = Production::find($production_id);
-            $productionLabel = $prod ? $prod->production_label : null;
+        $production = null;
+        $totalUnitLimit = 0;
+        $currentTotal = 0;
+        $remainingUnit = 0;
+        
+        if (!empty($production_id)) {
+            $production = Production::find($production_id);
+            if ($production) {
+                $productionLabel = $productionLabel ?? $production->production_label;
+                $totalUnitLimit = (int) $production->total_unit;
+                $currentTotal = (int) DetailProduct::where('production_id', $production_id)->sum('qty_unit');
+                $remainingUnit = max(0, $totalUnitLimit - $currentTotal);
+            }
         }
 
-        return view('detail_product.index', compact('detailProducts', 'sizes', 'productionLabel'));
+        return view('detail_product.index', compact('detailProducts', 'sizes', 'productionLabel', 'production', 'totalUnitLimit', 'currentTotal', 'remainingUnit'));
     }
 
     /**
@@ -72,34 +82,49 @@ class DetailProductController extends Controller
     {
         $validated = $request->validate([
             'production_id'    => 'required|integer|exists:productions,production_id',
-            'product_name'     => 'required|string|max:255',
-            'size_id'          => 'required|integer|exists:size,size_id',
-            'qty_unit'         => 'required|integer|min:1',
-            'price_unit'       => 'required|integer|min:1',
+            'products'         => 'required|array|min:1',
+            'products.*.product_name' => 'required|string|max:255',
+            'products.*.size_id'      => 'required|integer|exists:size,size_id',
+            'products.*.qty_unit'     => 'required|integer|min:1',
+            'products.*.price_unit'   => 'required|integer|min:1',
         ]);
-
-        $incomingQty = (int) $validated['qty_unit'];
-        $priceUnit = (int) $validated['price_unit'];
 
         $production = Production::find($validated['production_id']);
         $totalUnitLimit = $production ? (int) $production->total_unit : 0;
         $productionLabel = $production ? $production->production_label : null;
 
         $currentTotal = (int) DetailProduct::where('production_id', $validated['production_id'])->sum('qty_unit');
+        
+        // Calculate total incoming quantity
+        $totalIncomingQty = 0;
+        foreach ($validated['products'] as $product) {
+            $totalIncomingQty += (int) $product['qty_unit'];
+        }
 
-        if ($currentTotal + $incomingQty > $totalUnitLimit) {
+        if ($currentTotal + $totalIncomingQty > $totalUnitLimit) {
             return redirect()->route('detail_product.index', [
                 'production_id' => $validated['production_id'],
                 'production_label' => $productionLabel,
-            ])->withInput()->with('error', 'Gagal input! Kuantitas melebihi batas');
+            ])->withInput()->with('error', 'Gagal input! Total kuantitas melebihi batas. Limit: ' . number_format($totalUnitLimit) . ', Terpakai: ' . number_format($currentTotal) . ', Sisa: ' . number_format($totalUnitLimit - $currentTotal));
         }
 
-        DetailProduct::create($validated);
+        // Create all products
+        $createdCount = 0;
+        foreach ($validated['products'] as $product) {
+            DetailProduct::create([
+                'production_id' => $validated['production_id'],
+                'product_name' => $product['product_name'],
+                'size_id' => $product['size_id'],
+                'qty_unit' => $product['qty_unit'],
+                'price_unit' => $product['price_unit'],
+            ]);
+            $createdCount++;
+        }
 
         return redirect()->route('detail_product.index', [
             'production_id' => $validated['production_id'],
             'production_label' => $productionLabel,
-        ])->with('success', 'Detail product created.');
+        ])->with('success', $createdCount . ' detail product(s) created.');
     }
 
     /**

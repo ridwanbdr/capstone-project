@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\QcCheck;
 use App\Models\DetailProduct;
+use App\Models\Production;
 use Illuminate\Http\Request;
 use App\Models\AvailStock; // added import
 
@@ -12,11 +13,64 @@ class QcCheckController extends Controller
     /**
      * Display a listing of QC Checks.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $qcChecks = QcCheck::with(['detailProduct'])->paginate(10);
-        $detailProducts = DetailProduct::with('production')->get();
-        return view('qc_check.index', compact('qcChecks', 'detailProducts'));
+        $productions = Production::orderBy('production_id', 'desc')->get();
+        $selectedProductionId = $request->query('production_id');
+        $completionFilter = $request->query('completion'); // completed | pending | all
+
+        // Calculate QC completion status for each production
+        $productionStatuses = [];
+        foreach ($productions as $production) {
+            $totalProducts = DetailProduct::where('production_id', $production->production_id)->count();
+
+            $qcCheckedProductIds = QcCheck::whereHas('detailProduct', function($q) use ($production) {
+                $q->where('production_id', $production->production_id);
+            })->pluck('product_id')->unique()->count();
+
+            $productionStatuses[$production->production_id] = [
+                'total' => $totalProducts,
+                'checked' => $qcCheckedProductIds,
+                'completed' => $totalProducts > 0 && $qcCheckedProductIds >= $totalProducts,
+                'percentage' => $totalProducts > 0 ? round(($qcCheckedProductIds / $totalProducts) * 100, 1) : 0
+            ];
+        }
+
+        // Apply completion filter to displayed productions
+        $filteredProductions = $productions->filter(function ($prod) use ($productionStatuses, $completionFilter) {
+            $status = $productionStatuses[$prod->production_id] ?? ['completed' => false];
+            if ($completionFilter === 'completed') {
+                return $status['completed'] === true;
+            }
+            if ($completionFilter === 'pending') {
+                return $status['completed'] === false;
+            }
+            return true; // all
+        });
+
+        // Only load QC checks & products when a production is selected
+        if ($selectedProductionId) {
+            $query = QcCheck::with(['detailProduct.production']);
+            $query->whereHas('detailProduct', function($q) use ($selectedProductionId) {
+                $q->where('production_id', $selectedProductionId);
+            });
+            $qcChecks = $query->orderBy('qc_id', 'desc')->paginate(10)->withQueryString();
+            $detailProducts = DetailProduct::with('production')
+                ->where('production_id', $selectedProductionId)
+                ->get();
+        } else {
+            $qcChecks = collect();
+            $detailProducts = collect();
+        }
+
+        return view('qc_check.index', [
+            'qcChecks' => $qcChecks,
+            'detailProducts' => $detailProducts,
+            'productions' => $filteredProductions,
+            'selectedProductionId' => $selectedProductionId,
+            'productionStatuses' => $productionStatuses,
+            'completionFilter' => $completionFilter,
+        ]);
     }
 
     /**
@@ -24,8 +78,9 @@ class QcCheckController extends Controller
      */
     public function create()
     {
-        $detailProducts = DetailProduct::all();
-        return view('qc_check.create', compact('detailProducts'));
+        $productions = Production::orderBy('production_id', 'desc')->get();
+        $detailProducts = DetailProduct::with('production')->get();
+        return view('qc_check.create', compact('detailProducts', 'productions'));
     }
 
     /**
@@ -38,20 +93,20 @@ class QcCheckController extends Controller
             'qty_passed' => 'required|integer|min:0',
             'qty_reject' => 'required|integer|min:0',
             'date' => 'required|date',
-            'qc_checker' => 'nullable|string',
+            'qc_checker' => 'required|string|max:255',
             'reject_reason' => 'nullable|string',
         ]);
 
-        // Get detail product and its production info
+        // Get detail product
         $detailProduct = DetailProduct::find($validated['product_id']);
-        $production = $detailProduct->production;
 
-        // Validate total qty must equal production total_unit
+        // Validate total qty must equal product qty_unit
         $total_qty = $validated['qty_passed'] + $validated['qty_reject'];
-        if ($total_qty != $production->total_unit) {
+        $productQtyUnit = (int) ($detailProduct->qty_unit ?? 0);
+        if ($total_qty != $productQtyUnit) {
             return back()
                 ->withErrors([
-                    'qty_passed' => "Total barang lolos + reject ({$total_qty}) harus sama dengan total unit produksi ({$production->total_unit})"
+                    'qty_passed' => "Total barang lolos + reject ({$total_qty}) harus sama dengan total unit produk ({$productQtyUnit})"
                 ])
                 ->withInput();
         }
@@ -93,8 +148,9 @@ class QcCheckController extends Controller
      */
     public function edit(QcCheck $qcCheck)
     {
-        $detailProducts = DetailProduct::all();
-        return view('qc_check.edit', compact('qcCheck', 'detailProducts'));
+        $productions = Production::orderBy('production_id', 'desc')->get();
+        $detailProducts = DetailProduct::with('production')->get();
+        return view('qc_check.edit', compact('qcCheck', 'detailProducts', 'productions'));
     }
 
     /**
@@ -107,20 +163,20 @@ class QcCheckController extends Controller
             'qty_passed' => 'required|integer|min:0',
             'qty_reject' => 'required|integer|min:0',
             'date' => 'required|date',
-            'qc_checker' => 'nullable|string',
+            'qc_checker' => 'required|string|max:255',
             'reject_reason' => 'nullable|string',
         ]);
 
-        // New detail product and production info
+        // New detail product
         $detailProductNew = DetailProduct::find($validated['product_id']);
-        $production = $detailProductNew->production;
 
-        // Validate total qty must equal production total_unit
+        // Validate total qty must equal product qty_unit
         $total_qty = $validated['qty_passed'] + $validated['qty_reject'];
-        if ($total_qty != $production->total_unit) {
+        $productQtyUnit = (int) ($detailProductNew->qty_unit ?? 0);
+        if ($total_qty != $productQtyUnit) {
             return back()
                 ->withErrors([
-                    'qty_passed' => "Total barang lolos + reject ({$total_qty}) harus sama dengan total unit produksi ({$production->total_unit})"
+                    'qty_passed' => "Total barang lolos + reject ({$total_qty}) harus sama dengan total unit produk ({$productQtyUnit})"
                 ])
                 ->withInput();
         }
@@ -218,5 +274,35 @@ class QcCheckController extends Controller
         $qcCheck->delete();
 
         return redirect()->route('qc_check.index')->with('success', 'Quality Control berhasil dihapus dan avail_stock diperbarui');
+    }
+
+    /**
+     * Bulk delete QC for a specific production (utility for card action).
+     */
+    public function destroyByProduction($productionId)
+    {
+        $qcChecks = QcCheck::whereHas('detailProduct', function ($q) use ($productionId) {
+            $q->where('production_id', $productionId);
+        })->get();
+
+        foreach ($qcChecks as $qcCheck) {
+            // reuse logic similar to destroy
+            $qtyToReduce = (int) ($qcCheck->qty_passed ?? 0);
+            $detailProduct = $qcCheck->detailProduct ?? DetailProduct::find($qcCheck->product_id);
+            $productName = $detailProduct->product_name ?? null;
+
+            if ($productName !== null && $qtyToReduce > 0) {
+                $avail = AvailStock::where('product_name', $productName)->orderBy('id', 'desc')->first();
+                if ($avail) {
+                    $avail->qty_unit = max(0, (int) $avail->qty_unit - $qtyToReduce);
+                    $avail->save();
+                }
+            }
+
+            $qcCheck->delete();
+        }
+
+        return redirect()->route('qc_check.index', ['production_id' => $productionId])
+            ->with('success', 'Semua QC untuk production ini telah dihapus.');
     }
 }

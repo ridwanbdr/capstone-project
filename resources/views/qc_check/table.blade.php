@@ -1,87 +1,101 @@
-<table class="table text-nowrap mb-0 align-middle">
-  <thead class="text-dark fs-4">
-    <tr>
-      <th class="border-bottom-0">
-        <h6 class="fw-semibold mb-0">QC ID</h6>
-      </th>
-      <th class="border-bottom-0">
-        <h6 class="fw-semibold mb-0">Produk</h6>
-      </th>
-      <th class="border-bottom-0">
-        <h6 class="fw-semibold mb-0">Qty Lolos</h6>
-      </th>
-      <th class="border-bottom-0">
-        <h6 class="fw-semibold mb-0">Qty Reject</h6>
-      </th>
-      <th class="border-bottom-0">
-        <h6 class="fw-semibold mb-0">Tanggal</h6>
-      </th>
-      <th class="border-bottom-0">
-        <h6 class="fw-semibold mb-0">QC Checker</h6>
-      </th>
-      <th class="border-bottom-0">
-        <h6 class="fw-semibold mb-0">Status</h6>
-      </th>
-      <th class="border-bottom-0">
-        <h6 class="fw-semibold mb-0">Aksi</h6>
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-    @forelse($qcChecks as $qc)
-      <tr>
-        <td class="border-bottom-0">
-          <h6 class="fw-semibold mb-0">{{ $qc->qc_id }}</h6>
-        </td>
-        <td class="border-bottom-0">
-          <p class="mb-0 fw-normal">{{ $qc->detailProduct?->product_name ?? '-' }}</p>
-        </td>
-        <td class="border-bottom-0">
-          <h6 class="fw-semibold mb-0">{{ $qc->qty_passed }}</h6>
-        </td>
-        <td class="border-bottom-0">
-          <h6 class="fw-semibold mb-0 text-danger">{{ $qc->qty_reject }}</h6>
-        </td>
-        <td class="border-bottom-0">
-          <p class="mb-0 fw-normal">{{ $qc->date->format('d/m/Y') }}</p>
-        </td>
-        <td class="border-bottom-0">
-          <p class="mb-0 fw-normal">{{ $qc->qc_checker ?? '-' }}</p>
-        </td>
-        <td class="border-bottom-0">
-          @if ($qc->qc_label === 'PASS')
-            <span class="badge bg-success rounded-3 fw-semibold">PASS</span>
-          @elseif ($qc->qc_label === 'FAIL')
-            <span class="badge bg-danger rounded-3 fw-semibold">FAIL</span>
-          @else
-            <span class="badge bg-warning rounded-3 fw-semibold">PENDING</span>
-          @endif
-        </td>
-        <td class="border-bottom-0">
-          <a href="{{ route('qc_check.edit', $qc->qc_id) }}" class="btn btn-sm btn-info">
-            <i class="ti ti-edit"></i> Edit
-          </a>
-          <button type="button" class="btn btn-sm btn-danger" onclick="deleteQc({{ $qc->qc_id }})">
-            <i class="ti ti-trash"></i> Hapus
-          </button>
-        </td>
-      </tr>
-    @empty
-      <tr>
-        <td colspan="8" class="text-center py-4">
-          <p class="text-muted mb-0">Tidak ada data Quality Control</p>
-        </td>
-      </tr>
-    @endforelse
-  </tbody>
-</table>
+<div class="table-responsive px-5 py-3">
+    <table class="table align-middle mb-0">
+        <thead class="table-light text-center">
+            <tr>
+                <th class="ps-4">
+                    <span class="fw-semibold text-dark">QC ID</span>
+                </th>
+                <th>
+                    <span class="fw-semibold text-dark">Produk</span>
+                </th>
+                <th class="text-center">
+                    <span class="fw-semibold text-dark">Qty Lolos</span>
+                </th>
+                <th class="text-center">
+                    <span class="fw-semibold text-dark">Qty Reject</span>
+                </th>
+                <th class="text-center">
+                    <span class="fw-semibold text-dark">Tanggal</span>
+                </th>
+                <th>
+                    <span class="fw-semibold text-dark">QC Checker</span>
+                </th>
+                <th class="text-center">
+                    <span class="fw-semibold text-dark">Status</span>
+                </th>
+                <th class="text-center">
+                    <span class="fw-semibold text-dark">Aksi</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($qcChecks as $qc)
+            <tr class="border-bottom">
+                <td class="ps-4">
+                    <div class="text-muted">{{ $qc->qc_id }}</div>
+                </td>
+                <td>
+                    <span class="fw-semibold">{{ $qc->detailProduct?->product_name ?? '-' }}</span>
+                    @if($qc->detailProduct?->size)
+                        <br><small class="text-muted">Size: {{ $qc->detailProduct->size->size_label }}</small>
+                    @endif
+                </td>
+                <td class="text-center">
+                    <span class="fw-bold text-success">{{ number_format($qc->qty_passed) }}</span>
+                </td>
+                <td class="text-center">
+                    <span class="fw-bold text-danger">{{ number_format($qc->qty_reject) }}</span>
+                </td>
+                <td class="text-center">
+                    <span class="text-muted">{{ $qc->date->format('d/m/Y') }}</span>
+                </td>
+                <td>
+                    <span class="fw-normal">{{ $qc->qc_checker ?? '-' }}</span>
+                </td>
+                <td class="text-center">
+                    @if ($qc->qc_label === 'PASS')
+                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 fw-semibold">PASS</span>
+                    @elseif ($qc->qc_label === 'FAIL')
+                        <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 fw-semibold">FAIL</span>
+                    @else
+                        <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 fw-semibold">PENDING</span>
+                    @endif
+                </td>
+                <td class="text-center">
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{{ route('qc_check.edit', $qc->qc_id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <i class="ti ti-edit"></i>
+                        </a>
+                        <form action="{{ route('qc_check.destroy', $qc->qc_id) }}"
+                              method="POST"
+                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                <i class="ti ti-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="8" class="text-center py-5">
+                    <div class="text-muted">
+                        <i class="ti ti-clipboard-list fs-1 d-block mb-3"></i>
+                        <p class="mb-0">Tidak ada data Quality Control</p>
+                    </div>
+                </td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
 
-@push('scripts')
-<script>
-function deleteQc(id) {
-  if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-    document.getElementById('delete-form-' + id).submit();
-  }
-}
-</script>
-@endpush
+@if(isset($qcChecks) && $qcChecks->hasPages())
+<div class="card-footer bg-white border-top py-3">
+    <div class="d-flex justify-content-center">
+        {{ $qcChecks->links() }}
+    </div>
+</div>
+@endif

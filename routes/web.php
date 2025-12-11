@@ -22,6 +22,7 @@ Route::post('/logout', [HomeController::class, 'logout'])->name('logout');
 Route::resource('raw_stock', RawStockController::class);
 Route::resource('production', ProductionController::class);
 Route::resource('qc_check', QcCheckController::class);
+Route::delete('/qc_check/production/{production}', [QcCheckController::class, 'destroyByProduction'])->name('qc_check.destroy_production');
 
 // tambahkan route resource untuk transactions (tanpa menghapus baris lain)
 Route::resource('transactions', TransactionController::class);
