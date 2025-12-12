@@ -71,12 +71,16 @@
                         <label class="form-label fw-semibold">Paid (Rp)</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light">Rp</span>
-                            <input type="text" name="paid" id="paid" class="form-control" placeholder="0">
+                            <input type="text" name="paid" id="paid" class="form-control" placeholder="0" required>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Metode Pembayaran</label>
-                        <input type="text" name="payment_method" class="form-control" placeholder="Cash / Transfer / QRIS">
+                        <select name="payment_method" id="payment_method" class="form-select" required>
+                            <option value="cash">Cash</option>
+                            <option value="transfer">Transfer</option>
+                            <option value="qris">QRIS</option>
+                        </select>
                     </div>
                     <div class="mb-3 d-none" id="dueDateWrapper">
                         <label class="form-label fw-semibold">Jatuh Tempo</label>
@@ -87,7 +91,10 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Status</label>
-                        <input type="text" name="status" class="form-control" placeholder="contoh: dibayar / pending">
+                        <select name="status" id="status" class="form-select" required>
+                            <option value="dibayar">Dibayar</option>
+                            <option value="pending">Pending</option>
+                        </select>
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg">
@@ -104,16 +111,52 @@
 </div>
 
 @php
-    $catalogJson = $availStocks->map(function($a) use($sizes){
-        $sizeLabel = $sizes?->firstWhere('size_id', $a->size_id)->size_label ?? '';
-        return [
-            'id' => $a->id,
-            'product_name' => $a->product_name,
-            'size_label' => $sizeLabel,
-            'price' => (int) $a->price_unit,
-            'stock' => (int) $a->qty_unit,
-        ];
-    })->values()->toJson();
+    // Prefer server-provided $availableProducts (should contain only products that passed QC).
+    // Fallback to $availStocks if available.
+    $sourceProducts = $availableProducts ?? null;
+    if (is_null($sourceProducts) && isset($availStocks)) {
+        // fallback mapping from availStocks
+        $sourceProducts = $availStocks->map(function($a) use($sizes){
+            $sizeLabel = $sizes?->firstWhere('size_id', $a->size_id)->size_label ?? '';
+            return (object) [
+                'id' => $a->id,
+                'product_name' => $a->product_name,
+                'size_label' => $sizeLabel,
+                'price' => (int) $a->price_unit,
+                'stock' => (int) $a->qty_unit,
+            ];
+        });
+    }
+
+    // If $availableProducts provided, map to expected fields
+    if (!is_null($sourceProducts)) {
+        $catalogJson = collect($sourceProducts)->map(function($p) use($sizes){
+            // support both arrays and objects
+            $id = $p->product_id ?? $p->id ?? ($p['product_id'] ?? $p['id'] ?? null);
+            $name = $p->product_name ?? ($p['product_name'] ?? '');
+            $sizeLabel = null;
+            if (isset($p->size) && $p->size) {
+                $sizeLabel = $p->size->size_label ?? ($p['size']['size_label'] ?? null);
+            }
+            if (!$sizeLabel && isset($p->size_label)) $sizeLabel = $p->size_label;
+            $price = $p->price_unit ?? $p->price ?? ($p['price_unit'] ?? $p['price'] ?? 0);
+            $stock = $p->qty_unit ?? $p->stock ?? ($p['qty_unit'] ?? $p['stock'] ?? 0);
+
+            return [
+                'id' => $id,
+                'product_name' => $name,
+                'size_label' => $sizeLabel ?? '',
+                'price' => (int) $price,
+                'stock' => (int) $stock,
+            ];
+        })
+        // remove products with zero or negative stock from catalog
+        ->filter(function($p){ return (int)($p['stock'] ?? 0) > 0; })
+        ->values()
+        ->toJson();
+    } else {
+        $catalogJson = '[]';
+    }
 @endphp
 
 <script>
@@ -181,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="text-primary fw-bold">${formatRupiah(item.price)}</div>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <input type="number" class="form-control form-control-sm cart-qty" min="1" max="${item.stock}" value="${item.qty}" data-idx="${idx}">
+                        <input type="number" class="form-control form-control-sm cart-qty" min="1" max="${item.stock}" value="${item.qty}" data-idx="${idx}" required>
                         <div class="fw-semibold">${formatRupiah(item.price * item.qty)}</div>
                         <button type="button" class="btn btn-sm btn-outline-danger" data-remove="${idx}"><i class="ti ti-trash"></i></button>
                     </div>
@@ -209,8 +252,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderHiddenInputs() {
         itemsContainer.innerHTML = cart.map((item, idx) => `
-            <input type="hidden" name="items[${idx}][id]" value="${item.id}">
-            <input type="hidden" name="items[${idx}][qty]" value="${item.qty}">
+            <input type="hidden" name="items[${idx}][id]" value="${item.id}" required>
+            <input type="hidden" name="items[${idx}][qty]" value="${item.qty}" required>
         `).join('');
     }
 
@@ -258,6 +301,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // validate due date on submit
     document.getElementById('transactionForm')?.addEventListener('submit', (e) => {
+        // before submitting, convert formatted paid input back to plain number
+        if (paidInput) {
+            const numericPaid = unformatRupiah(paidInput.value);
+            paidInput.value = numericPaid;
+        }
         if (!cart.length) {
             e.preventDefault();
             alert('Tambahkan minimal 1 produk ke keranjang.');
@@ -283,5 +331,41 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCatalog(catalog);
     renderCart();
     toggleDueDate();
+
+    // --- Rupiah formatting helpers for `paid` input ---
+    function formatToRupiahInput(value) {
+        if (value === null || value === undefined) return '';
+        // remove non digits
+        const digits = String(value).replace(/[^0-9]/g, '');
+        if (!digits) return '';
+        return 'Rp ' + Number(digits).toLocaleString('id-ID');
+    }
+
+    function unformatRupiah(formatted) {
+        if (!formatted) return '';
+        return String(formatted).replace(/[^0-9]/g, '') || '0';
+    }
+
+    if (paidInput) {
+        // on input: keep digits only and format with rupiah prefix
+        paidInput.addEventListener('input', (ev) => {
+            const caret = paidInput.selectionStart;
+            const raw = unformatRupiah(paidInput.value);
+            paidInput.value = formatToRupiahInput(raw);
+            // try to restore caret near end
+            try { paidInput.setSelectionRange(paidInput.value.length, paidInput.value.length); } catch(e){}
+        });
+
+        // on focus: remove formatting to make editing easier
+        paidInput.addEventListener('focus', () => {
+            const raw = unformatRupiah(paidInput.value);
+            paidInput.value = raw === '0' ? '' : raw;
+        });
+
+        // on blur: format to rupiah
+        paidInput.addEventListener('blur', () => {
+            paidInput.value = formatToRupiahInput(unformatRupiah(paidInput.value));
+        });
+    }
 });
 </script>

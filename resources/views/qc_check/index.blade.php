@@ -26,14 +26,16 @@
             </div>
         @endif
 
-        {{-- Production Status Card --}}
-        <div class="card shadow-sm border-0 mb-4">
+            @if(empty($selectedProductionId))
+            {{-- Production Status Card --}}
+                <div class="card shadow-sm border-0 mb-4">
             <div class="card-header py-3">
                 <div class="d-flex align-items-center text-primary">
                     <i class="ti ti-checklist me-2 fs-5"></i>
                     <h5 class="mb-0 fw-semibold">Status QC per Production</h5>
                 </div>
             </div>
+            @endif
             <div class="card-body p-4">
                 <div class="d-flex flex-wrap gap-2 mb-3">
                     <a href="{{ route('qc_check.index') }}" class="btn btn-sm {{ empty($completionFilter) ? 'btn-primary' : 'btn-outline-primary' }}">
@@ -72,13 +74,13 @@
                                                     <i class="ti ti-clock"></i> Belum
                                                 </span>
                                             @endif
-                                            <form action="{{ route('qc_check.destroy_production', $production->production_id) }}" method="POST" onsubmit="return confirm('Hapus semua QC untuk production ini?');">
+                                            {{-- <form action="{{ route('qc_check.destroy_production', $production->production_id) }}" method="POST" onsubmit="return confirm('Hapus semua QC untuk production ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-outline-danger p-1" title="Hapus semua QC">
                                                     <i class="ti ti-trash"></i>
                                                 </button>
-                                            </form>
+                                            </form> --}}
                                         </div>
                                     </div>
                                     <div class="progress mb-2" style="height: 8px;">

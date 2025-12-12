@@ -46,4 +46,21 @@ class AvailStock extends Model
         return $this->hasMany(Transaction::class, 'id', 'id');
     }
 
+    /**
+     * Automatically delete avail stock record when quantity reaches zero.
+     * This keeps the catalog from showing out-of-stock items.
+     */
+    protected static function booted()
+    {
+        static::saved(function ($model) {
+            // if qty_unit is zero or less, remove this record
+            if ((int) ($model->qty_unit ?? 0) <= 0) {
+                // avoid double-delete if already trashed/removed
+                if ($model->exists) {
+                    $model->delete();
+                }
+            }
+        });
+    }
+
 }

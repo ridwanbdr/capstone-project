@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use App\Models\Production;
-use App\Models\RawStock;
 use Carbon\Carbon;
-use DB;
+use App\Models\RawStock;
+use App\Models\Production;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class ProductionSeeder extends Seeder
 {
@@ -21,8 +21,8 @@ class ProductionSeeder extends Seeder
         // contoh data produksi dengan daftar bahan (nama bahan dan qty yang diinginkan)
         $productions = [
             [
-                'production_lead' => 'Tim A',
-                'production_label' => 'Batch A1',
+                'production_lead' => 'Wawan Kucing',
+                'production_label' => 'Kain Batik',
                 'production_date' => Carbon::now()->subDays(5)->format('Y-m-d'),
                 'total_unit' => 50,
                 'materials' => [
@@ -31,8 +31,8 @@ class ProductionSeeder extends Seeder
                 ],
             ],
             [
-                'production_lead' => 'Tim B',
-                'production_label' => 'Batch B1',
+                'production_lead' => 'Ira Sumber',
+                'production_label' => 'Kemeja Anak',
                 'production_date' => Carbon::now()->subDays(2)->format('Y-m-d'),
                 'total_unit' => 30,
                 'materials' => [
@@ -41,8 +41,8 @@ class ProductionSeeder extends Seeder
                 ],
             ],
             [
-                'production_lead' => 'Tim C',
-                'production_label' => 'Batch C1',
+                'production_lead' => 'Ira Sumber',
+                'production_label' => 'Celana Katun',
                 'production_date' => Carbon::now()->format('Y-m-d'),
                 'total_unit' => 20,
                 'materials' => [
