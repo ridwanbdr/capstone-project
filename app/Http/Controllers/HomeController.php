@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -25,6 +27,7 @@ class HomeController extends Controller
     {
         return view('layouts.app');
     }
+
     /**
      * Show login page.
      *
@@ -32,7 +35,35 @@ class HomeController extends Controller
      */
     public function login()
     {
+        // if already authenticated, redirect to dashboard
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
         return view('auth.login');
+    }
+
+    /**
+     * Handle login submission.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function loginSubmit(Request $request)
+    {
+        $credentials = $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string|min:1',
+        ]);
+
+        // Attempt to authenticate using username column (not email)
+        if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password']], $request->filled('remember'))) {
+            $request->session()->regenerate();
+            return redirect()->route('dashboard')->with('success', 'Login berhasil!');
+        }
+
+        return back()->withErrors([
+            'username' => 'Username atau password salah.',
+        ])->onlyInput('username');
     }
 
     /**
@@ -56,13 +87,16 @@ class HomeController extends Controller
     }
 
     /**
-     * Show logout page.
+     * Handle logout.
      *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
-    public function logout()
+    public function logout(Request $request)
     {
-        // Logout logic would go here
-        return redirect('/');
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('login')->with('success', 'Logout berhasil.');
     }
 }
