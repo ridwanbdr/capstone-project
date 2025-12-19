@@ -55,8 +55,15 @@ class QcCheckController extends Controller
                 $q->where('production_id', $selectedProductionId);
             });
             $qcChecks = $query->orderBy('qc_id', 'desc')->paginate(10)->withQueryString();
-            $detailProducts = DetailProduct::with('production')
+            
+            // Get only products that haven't been QC'd yet
+            $qcedProductIds = QcCheck::whereHas('detailProduct', function($q) use ($selectedProductionId) {
+                $q->where('production_id', $selectedProductionId);
+            })->pluck('product_id')->toArray();
+            
+            $detailProducts = DetailProduct::with('production', 'size')
                 ->where('production_id', $selectedProductionId)
+                ->whereNotIn('product_id', $qcedProductIds)
                 ->get();
         } else {
             $qcChecks = collect();
