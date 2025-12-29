@@ -2,17 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Transaction;
-use App\Models\AvailStock;
+use Exception;
 use App\Models\Size;
+use App\Models\AvailStock;
+use App\Models\Transaction;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Exception;
-use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware(function ($request, $next) {
+            $user = \App\Models\User::find(Auth::id());
+            if (!$user) {
+                return redirect()->route('login')->with('error', 'Please login to continue.');
+            }
+            // Only Admin can access
+            if (!$user->isAdmin()) {
+                abort(403, 'Unauthorized access. Only Admin can access this module.');
+            }
+            return $next($request);
+        });
+    }
+
     public function index(Request $request, $avail_stock_id = null)
     {
         if (is_null($avail_stock_id)) {

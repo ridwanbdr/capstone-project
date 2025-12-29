@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'role',
         'nama_lengkap',
+        'name',
         'email'
     ];
 
@@ -79,42 +80,50 @@ class User extends Authenticatable
     }
     
     /**
-     * Get the BarangMasuk records for the user.
+     * Get tasks assigned to this user.
      */
-    public function barangMasuk(): HasMany
+    public function assignedTasks(): HasMany
     {
-        return $this->hasMany(BarangMasuk::class, 'user_id');
+        return $this->hasMany(Task::class, 'assigned_to');
     }
     
     /**
-     * Get the BarangKeluar records for the user.
+     * Get tasks assigned by this user.
      */
-    public function barangKeluar(): HasMany
+    public function createdTasks(): HasMany
     {
-        return $this->hasMany(BarangKeluar::class, 'user_id');
+        return $this->hasMany(Task::class, 'assigned_by');
     }
     
     /**
-     * Get the QualityCheck records for the user.
+     * Get notifications for this user.
      */
-    public function qualityCheck(): HasMany
+    public function notifications(): HasMany
     {
-        return $this->hasMany(QualityCheck::class, 'user_id');
+        return $this->hasMany(Notification::class);
     }
     
     /**
-     * Get the OrderMassal records for the user.
+     * Check if user is admin.
      */
-    public function orderMassal(): HasMany
+    public function isAdmin(): bool
     {
-        return $this->hasMany(OrderMassal::class, 'user_id');
+        return !empty($this->role) && strtolower($this->role) === 'admin';
     }
     
     /**
-     * Get the Transaksi records for the user.
+     * Check if user is warehouse staff.
      */
-    public function transaksi(): HasMany
+    public function isWarehouseStaff(): bool
     {
-        return $this->hasMany(Transaksi::class, 'user_id');
+        return !empty($this->role) && strtolower($this->role) === 'warehouse_staff';
+    }
+    
+    /**
+     * Check if user is QC staff.
+     */
+    public function isQcStaff(): bool
+    {
+        return !empty($this->role) && strtolower($this->role) === 'qc_staff';
     }
 }

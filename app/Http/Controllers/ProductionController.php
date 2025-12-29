@@ -1,17 +1,38 @@
 <?php
-
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Auth;
 
-use App\Models\Production;
+use Exception;
 use App\Models\RawStock;
+use App\Models\Production;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\DB;
-use Exception;
 
 class ProductionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware(function ($request, $next) {
+            $user = \App\Models\User::find(Auth::id());
+            if (!$user) {
+                return redirect()->route('login')->with('error', 'Please login to continue.');
+            }
+            // Admin has full access
+            if ($user->isAdmin()) {
+                return $next($request);
+            }
+            // Warehouse Staff can access
+            if ($user->isWarehouseStaff()) {
+                return $next($request);
+            }
+            abort(403, 'Unauthorized access. Only Admin and Warehouse Staff can access this module.');
+        });
+    }
+
     /**
      * Display a listing of the resource.
      */
