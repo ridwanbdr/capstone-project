@@ -1,15 +1,36 @@
 <?php
-
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\QcCheck;
-use App\Models\DetailProduct;
 use App\Models\Production;
 use Illuminate\Http\Request;
+use App\Models\DetailProduct;
+use Illuminate\Routing\Controller;
 use App\Models\AvailStock; // added import
 
 class QcCheckController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware(function ($request, $next) {
+            $user = \App\Models\User::find(Auth::id());
+            if (!$user) {
+                return redirect()->route('login')->with('error', 'Please login to continue.');
+            }
+            // Admin has full access
+            if ($user->isAdmin()) {
+                return $next($request);
+            }
+            // QC Staff can access
+            if ($user->isQcStaff()) {
+                return $next($request);
+            }
+            abort(403, 'Unauthorized access. Only Admin and QC Staff can access this module.');
+        });
+    }
+
     /**
      * Display a listing of QC Checks.
      */

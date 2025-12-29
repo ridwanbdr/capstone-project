@@ -1,14 +1,32 @@
 <?php
-
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\Request;
 use App\Models\DetailProduct;
 use App\Models\Size;
 use App\Models\Production; // added import
+use Illuminate\Routing\Controller;
+
 
 class DetailProductController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware(function ($request, $next) {
+            $user = \App\Models\User::find(Auth::id());
+            if (!$user) {
+                return redirect()->route('login')->with('error', 'Please login to continue.');
+            }
+            // Only Admin can access
+            if (!$user->isAdmin()) {
+                abort(403, 'Unauthorized access. Only Admin can access this module.');
+            }
+            return $next($request);
+        });
+    }
+
     /**
      * Display a listing of the resource.
      *
