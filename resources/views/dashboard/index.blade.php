@@ -3,26 +3,78 @@
 @section('title', 'Dashboard')
 
 @section('content')
+        <!-- Page Header -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <h3 class="fw-bold mb-1">Dashboard</h3>
+                <p class="text-muted mb-0">Ringkasan performa bisnis Anda</p>
+              </div>
+              <div class="d-flex gap-2">
+                <a href="{{ route('transactions.index') }}" class="btn btn-outline-primary">
+                  <i class="ti ti-shopping-cart me-2"></i>Transaksi
+                </a>
+                <a href="{{ route('detail_product.index') }}" class="btn btn-outline-success">
+                  <i class="ti ti-package me-2"></i>Produk
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!--  Row 1: Quick Access Menu + Sales Scorecard -->
         <div class="row mb-4">
           <div class="col-lg-8">
             <!-- Quick Access Menu -->
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm h-100">
               <div class="card-body p-4">
-                <h5 class="card-title fw-semibold mb-4">
-                  <i class="ti ti-bolt me-2 text-warning"></i>Quick Access
+                <h5 class="card-title fw-semibold mb-4 d-flex align-items-center">
+                  <i class="ti ti-bolt me-2 text-warning fs-5"></i>Akses Cepat
                 </h5>
                 <div class="row g-3">
                   <div class="col-md-6">
-                    <a href="{{ route('transactions.index') }}" class="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center gap-2 py-3">
-                      <i class="ti ti-shopping-cart fs-5"></i>
-                      <span>Transaksi</span>
+                    <a href="{{ route('transactions.index') }}" class="card border-0 shadow-sm text-decoration-none h-100 hover-lift">
+                      <div class="card-body p-3 text-center">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                          <i class="ti ti-shopping-cart fs-3 text-primary"></i>
+                        </div>
+                        <h6 class="fw-semibold mb-1">Transaksi</h6>
+                        <small class="text-muted">Kelola penjualan</small>
+                      </div>
                     </a>
                   </div>
                   <div class="col-md-6">
-                    <a href="{{ route('detail_product.index') }}" class="btn btn-success btn-lg w-100 d-flex align-items-center justify-content-center gap-2 py-3">
-                      <i class="ti ti-package fs-5"></i>
-                      <span>Detail Produk</span>
+                    <a href="{{ route('detail_product.index') }}" class="card border-0 shadow-sm text-decoration-none h-100 hover-lift">
+                      <div class="card-body p-3 text-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                          <i class="ti ti-package fs-3 text-success"></i>
+                        </div>
+                        <h6 class="fw-semibold mb-1">Detail Produk</h6>
+                        <small class="text-muted">Kelola produk</small>
+                      </div>
+                    </a>
+                  </div>
+                  <div class="col-md-6">
+                    <a href="{{ route('raw_stock.index') }}" class="card border-0 shadow-sm text-decoration-none h-100 hover-lift">
+                      <div class="card-body p-3 text-center">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                          <i class="ti ti-package fs-3 text-warning"></i>
+                        </div>
+                        <h6 class="fw-semibold mb-1">Bahan Baku</h6>
+                        <small class="text-muted">Kelola stok</small>
+                      </div>
+                    </a>
+                  </div>
+                  <div class="col-md-6">
+                    <a href="{{ route('qc_check.index') }}" class="card border-0 shadow-sm text-decoration-none h-100 hover-lift">
+                      <div class="card-body p-3 text-center">
+                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                          <i class="ti ti-checklist fs-3 text-info"></i>
+                        </div>
+                        <h6 class="fw-semibold mb-1">Quality Control</h6>
+                        <small class="text-muted">Cek kualitas</small>
+                      </div>
                     </a>
                   </div>
                 </div>
@@ -32,48 +84,70 @@
 
           <!-- Sales Scorecard -->
           <div class="col-lg-4">
-            <div class="card overflow-hidden border-0 shadow-sm">
-              <div class="card-body p-4">
-                <h5 class="card-title fw-semibold mb-3">
-                  <i class="ti ti-currency-dollar me-2 text-success"></i>Total Penjualan
-                </h5>
+            <div class="card overflow-hidden border-0 shadow-sm h-100">
+              <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <h5 class="card-title fw-semibold mb-0">
+                    <i class="ti ti-currency-dollar me-2 text-success"></i>Total Penjualan
+                  </h5>
+                  <div class="bg-success bg-opacity-10 rounded-circle p-2">
+                    <i class="ti ti-chart-line text-success"></i>
+                  </div>
+                </div>
                 <h2 class="fw-bold text-success mb-3">{{ $totalSales['formatted'] }}</h2>
                 <div class="d-flex align-items-center gap-2 mb-3">
                   <span class="badge bg-success-subtle text-success px-3 py-2">
-                    <i class="ti ti-arrow-up"></i> {{ $totalSales['count'] }} Transaksi
+                    <i class="ti ti-receipt"></i> {{ $totalSales['count'] }} Transaksi
                   </span>
-                </div>
-                <p class="text-muted mb-0 fs-3">
-                  Total nilai penjualan dari seluruh transaksi hingga hari ini
+                  <span class="badge bg-success-subtle text-success px-3 py-2">
+                    <i class="ti ti-package fs-3 text-success"></i> {{ $totalQuantityProductSold['formatted'] }}
+                  </span>
+                </div>                
+                <p class="text-muted mb-0 small">
+                  Penjualan dari seluruh transaksi hingga hari ini
                 </p>
+
+                {{-- <div class="mt-auto pt-3 border-top">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <small class="text-muted">Status</small>
+                    <span class="badge bg-success">Aktif</span>
+                  </div>
+                </div> --}}
               </div>
             </div>
           </div>
         </div>
 
-        <!--  Row 2: Monthly Bar Chart + Production Pie Chart -->
+        <!--  Row 2: Monthly Bar Chart + Best-Selling Products Pie Chart -->
         <div class="row">
           <div class="col-lg-8 d-flex align-items-stretch">
             <div class="card w-100 border-0 shadow-sm">
-              <div class="card-body p-4">
-                <div class="mb-4">
-                  <h5 class="card-title fw-semibold">
-                    <i class="ti ti-chart-bar me-2 text-primary"></i>Performa Penjualan per Bulan
-                  </h5>
-                  <small class="text-muted">Data transaksi 12 bulan terakhir</small>
+              <div class="card-header bg-white border-bottom py-3">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <h5 class="card-title fw-semibold mb-1">
+                      <i class="ti ti-chart-bar me-2 text-primary"></i>Performa Penjualan per Bulan
+                    </h5>
+                    <small class="text-muted">Data transaksi berdasarkan tahun dan bulan</small>
+                  </div>
                 </div>
-                <div id="monthlyChart" style="height: 300px;"></div>
+              </div>
+              <div class="card-body p-4">
+                <div id="monthlyChart" style="height: 350px;"></div>
               </div>
             </div>
           </div>
 
           <div class="col-lg-4 d-flex align-items-stretch">
             <div class="card w-100 border-0 shadow-sm">
-              <div class="card-body p-4">
-                <h5 class="card-title fw-semibold mb-4">
-                  <i class="ti ti-pie-chart me-2 text-info"></i>Distribusi Produk
+              <div class="card-header bg-white border-bottom py-3">
+                <h5 class="card-title fw-semibold mb-1">
+                  <i class="ti ti-pie-chart me-2 text-info"></i>Produk Terlaris
                 </h5>
-                <div id="productionChart" style="height: 300px;"></div>
+                <small class="text-muted">Distribusi berdasarkan total penjualan</small>
+              </div>
+              <div class="card-body p-4">
+                <div id="productionChart" style="height: 350px;"></div>
               </div>
             </div>
           </div>
@@ -83,10 +157,12 @@
         <div class="row mt-4">
           <div class="col-lg-6 d-flex align-items-stretch">
             <div class="card w-100 border-0 shadow-sm">
-              <div class="card-body p-4">
-                <h5 class="card-title fw-semibold mb-4">
+              <div class="card-header bg-white border-bottom py-3">
+                <h5 class="card-title fw-semibold mb-0">
                   <i class="ti ti-inbox me-2 text-warning"></i>Bahan Baku Terbaru
                 </h5>
+              </div>
+              <div class="card-body p-4">
                 <div class="table-responsive">
                   <table class="table text-nowrap mb-0 align-middle">
                     <thead class="text-dark fs-4">
@@ -102,10 +178,7 @@
                         </th>
                         <th class="border-bottom-0 text-end">
                           <h6 class="fw-semibold mb-0">Total Harga</h6>
-                        </th>
-                        <th class="border-bottom-0 text-center">
-                          <h6 class="fw-semibold mb-0">Tanggal</h6>
-                        </th>
+                        </th>                        
                       </tr>
                     </thead>
                     <tbody>
@@ -123,9 +196,6 @@
                         <td class="border-bottom-0 text-end">
                           <h6 class="fw-semibold mb-0 fs-4">{{ $stock['formatted_total'] }}</h6>
                         </td>
-                        <td class="border-bottom-0 text-center">
-                          <small class="text-muted">{{ $stock['date'] }}</small>
-                        </td>
                       </tr>
                       @empty
                       <tr>
@@ -141,10 +211,12 @@
 
           <div class="col-lg-6 d-flex align-items-stretch">
             <div class="card w-100 border-0 shadow-sm">
-              <div class="card-body p-4">
-                <h5 class="card-title fw-semibold mb-4">
+              <div class="card-header bg-white border-bottom py-3">
+                <h5 class="card-title fw-semibold mb-0">
                   <i class="ti ti-timeline me-2 text-danger"></i>Transaksi Terbaru
                 </h5>
+              </div>
+              <div class="card-body p-4">
                 <ul class="timeline-widget mb-0 position-relative">
                   @forelse($latestTransactions as $trans)
                   <li class="timeline-item d-flex position-relative overflow-hidden pb-3">
@@ -183,25 +255,49 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.0/dist/apexcharts.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Monthly Bar Chart
+    // Monthly Bar Chart with Year Legend
     const monthlyData = @json($monthlyData);
-    const monthlyLabels = monthlyData.map(item => item.month);
-    const monthlySales = monthlyData.map(item => item.total);
+    const monthlyCategories = monthlyData.categories || [];
+    const monthlySeries = monthlyData.series || [];
+    const years = monthlyData.years || [];
 
+    // Generate colors for each year
+    const colorPalette = ['#0d6efd', '#198754', '#ffc107', '#fd7e14', '#6f42c1', '#e83e8c', '#20c997', '#dc3545'];
+    
+    // Handle empty data
+    if (monthlySeries.length === 0) {
+        monthlySeries.push({
+            name: 'No Data',
+            data: new Array(12).fill(0)
+        });
+    }
+    
     const monthlyChartOptions = {
         chart: {
             type: 'bar',
-            height: 300,
+            height: 350,
             toolbar: {
-                show: false
+                show: true,
+                tools: {
+                    download: true,
+                    selection: true,
+                    zoom: true,
+                    zoomin: true,
+                    zoomout: true,
+                    pan: true,
+                    reset: true
+                }
             }
         },
-        colors: ['#0d6efd'],
+        colors: colorPalette.slice(0, monthlySeries.length),
         plotOptions: {
             bar: {
                 horizontal: false,
-                columnWidth: '45%',
-                endingShape: 'rounded'
+                columnWidth: '55%',
+                endingShape: 'rounded',
+                dataLabels: {
+                    position: 'top'
+                }
             }
         },
         dataLabels: {
@@ -213,18 +309,31 @@ document.addEventListener('DOMContentLoaded', function() {
             colors: ['transparent']
         },
         xaxis: {
-            categories: monthlyLabels,
+            categories: monthlyCategories,
+            labels: {
+                style: {
+                    fontSize: '12px'
+                }
+            }
         },
         yaxis: {
             title: {
-                text: 'Rp (Rupiah)'
+                text: 'Total Penjualan (Rp)',
+                style: {
+                    fontSize: '12px'
+                }
             },
-            min: 0,
-            max: 500000,
-            tickAmount: 5,
             labels: {
                 formatter: function (value) {
-                    return 'Rp ' + (value / 1000).toFixed(0) + 'K';
+                    if (value >= 1000000) {
+                        return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
+                    } else if (value >= 1000) {
+                        return 'Rp ' + (value / 1000).toFixed(0) + 'K';
+                    }
+                    return 'Rp ' + value;
+                },
+                style: {
+                    fontSize: '11px'
                 }
             }
         },
@@ -237,54 +346,150 @@ document.addEventListener('DOMContentLoaded', function() {
                         maximumFractionDigits: 0
                     }).format(value);
                 }
-            }
+            },
+            shared: true,
+            intersect: false
         },
         legend: {
             position: 'top',
-            horizontalAlign: 'right'
+            horizontalAlign: 'left',
+            offsetY: -5,
+            fontSize: '13px',
+            markers: {
+                width: 12,
+                height: 12,
+                radius: 6
+            },
+            itemMargin: {
+                horizontal: 10,
+                vertical: 5
+            }
         },
-        series: [{
-            name: 'Penjualan',
-            data: monthlySales
-        }]
+        grid: {
+            borderColor: '#e7e7e7',
+            strokeDashArray: 4,
+            xaxis: {
+                lines: {
+                    show: false
+                }
+            },
+            yaxis: {
+                lines: {
+                    show: true
+                }
+            }
+        },
+        series: monthlySeries.map((series, index) => ({
+            name: series.name,
+            data: series.data
+        }))
     };
 
     const monthlyChart = new ApexCharts(document.querySelector("#monthlyChart"), monthlyChartOptions);
     monthlyChart.render();
 
-    // Production Pie Chart
+    // Best-Selling Products Pie Chart
     const productionData = @json($productionDistribution);
-    const pieLabels = productionData.map(item => item.label);
-    const pieCounts = productionData.map(item => item.count);
+    const pieLabels = productionData.length > 0 ? productionData.map(item => item.label) : ['No Data'];
+    const pieSales = productionData.length > 0 ? productionData.map(item => item.sales) : [1];
+
+    // Calculate percentages for display
+    const totalSales = pieSales.reduce((sum, val) => sum + val, 0);
+    const piePercentages = pieSales.map(sales => totalSales > 0 ? (sales / totalSales * 100) : 0);
 
     const pieChartOptions = {
         chart: {
             type: 'pie',
-            height: 300
-        },
-        labels: pieLabels,
-        colors: ['#0d6efd', '#198754', '#ffc107', '#fd7e14', '#6f42c1', '#e83e8c'],
-        series: pieCounts,
-        legend: {
-            position: 'bottom',
-            fontSize: '12px'
-        },
-        plotOptions: {
-            pie: {
-                dataLabels: {
-                    offset: -5
+            height: 350,
+            toolbar: {
+                show: true,
+                tools: {
+                    download: true
                 }
             }
         },
-        dataLabels: {
-            formatter: function (val) {
-                return Math.round(val) + '%';
+        labels: pieLabels,
+        colors: ['#0d6efd', '#198754', '#ffc107', '#fd7e14', '#6f42c1', '#e83e8c', '#20c997', '#dc3545', '#0dcaf0', '#6610f2'],
+        series: pieSales,
+        legend: {
+            position: 'bottom',
+            fontSize: '12px',
+            formatter: function(seriesName, opts) {
+                const value = pieSales[opts.seriesIndex];
+                const percentage = piePercentages[opts.seriesIndex];
+                return seriesName + ': Rp ' + new Intl.NumberFormat('id-ID').format(value) + ' (' + percentage.toFixed(1) + '%)';
+            },
+            itemMargin: {
+                horizontal: 5,
+                vertical: 3
             }
-        }
+        },
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '60%'
+                },
+                expandOnClick: true
+            }
+        },
+        dataLabels: {
+            enabled: true,
+            formatter: function (val, opts) {
+                const value = pieSales[opts.seriesIndex];
+                return 'Rp ' + new Intl.NumberFormat('id-ID', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(value);
+            },
+            style: {
+                fontSize: '11px',
+                fontWeight: 600
+            },
+            dropShadow: {
+                enabled: true,
+                top: 1,
+                left: 1,
+                blur: 1,
+                opacity: 0.8
+            }
+        },
+        tooltip: {
+            enabled: true,
+            y: {
+                formatter: function (value, { seriesIndex }) {
+                    const percentage = piePercentages[seriesIndex];
+                    return 'Rp ' + new Intl.NumberFormat('id-ID', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(value) + ' (' + percentage.toFixed(2) + '%)';
+                }
+            }
+        },
+        responsive: [{
+            breakpoint: 480,
+            options: {
+                chart: {
+                    height: 300
+                },
+                legend: {
+                    position: 'bottom',
+                    fontSize: '10px'
+                }
+            }
+        }]
     };
 
     const pieChart = new ApexCharts(document.querySelector("#productionChart"), pieChartOptions);
     pieChart.render();
 });
 </script>
+<style>
+.hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+</style>
 @endpush

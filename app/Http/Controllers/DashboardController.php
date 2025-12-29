@@ -22,6 +22,8 @@ class DashboardController extends Controller
         // Total sales scorecard
         $totalSales = $this->getTotalSales();
 
+        $totalQuantityProductSold = $this->getTotalQuantityProductSold();
+
         // Production distribution for pie chart
         $productionDistribution = $this->getProductionDistribution();
 
@@ -34,6 +36,7 @@ class DashboardController extends Controller
         return view('dashboard.index', compact(
             'monthlyData',
             'totalSales',
+            'totalQuantityProductSold',
             'productionDistribution',
             'latestRawStocks',
             'latestTransactions'
@@ -41,26 +44,76 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get monthly transaction data for the last 12 months
+     * Get monthly transaction data grouped by year and month
+     * Returns data for multiple years if available
      */
     private function getMonthlyTransactionData()
     {
-        $data = [];
-        for ($i = 11; $i >= 0; $i--) {
-            $date = Carbon::now()->subMonths($i)->startOfMonth();
+        // Get all unique year-month combinations from transactions
+        $yearMonths = Transaction::selectRaw('YEAR(date) as year, MONTH(date) as month')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc')
+            ->limit(24) // Last 24 months
+            ->get()
+            ->reverse();
+
+        // Group by year
+        $groupedByYear = [];
+        foreach ($yearMonths as $ym) {
+            $year = $ym->year;
+            $month = $ym->month;
+            
+            if (!isset($groupedByYear[$year])) {
+                $groupedByYear[$year] = [];
+            }
+            
+            $date = Carbon::create($year, $month, 1);
             $monthName = $date->format('M');
-
-            // Sum all transactions for this month
-            $total = Transaction::whereYear('date', $date->year)
-                ->whereMonth('date', $date->month)
+            
+            $total = Transaction::whereYear('date', $year)
+                ->whereMonth('date', $month)
                 ->sum('total');
-
-            $data[] = [
+            
+            $groupedByYear[$year][] = [
                 'month' => $monthName,
+                'monthNum' => $month,
                 'total' => (int) $total,
             ];
         }
-        return $data;
+
+        // Format for chart (group by year)
+        $years = array_keys($groupedByYear);
+        $allMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        
+        // If no data, return empty structure
+        if (empty($years)) {
+            return [
+                'categories' => $allMonths,
+                'series' => [],
+                'years' => [],
+            ];
+        }
+        
+        $series = [];
+        foreach ($years as $year) {
+            $yearData = [];
+            foreach ($allMonths as $index => $monthName) {
+                $monthNum = $index + 1;
+                $found = collect($groupedByYear[$year])->firstWhere('monthNum', $monthNum);
+                $yearData[] = $found ? $found['total'] : 0;
+            }
+            $series[] = [
+                'name' => (string)$year,
+                'data' => $yearData,
+            ];
+        }
+
+        return [
+            'categories' => $allMonths,
+            'series' => $series,
+            'years' => $years,
+        ];
     }
 
     /**
@@ -76,23 +129,41 @@ class DashboardController extends Controller
         ];
     }
 
+    // Sum Quantity Product Sold
+    private function getTotalQuantityProductSold()
+    {
+        $total_qty = Transaction::sum('qty') ?? 0;
+        return [
+            'qty' => (int) $total_qty,
+            'formatted' => number_format($total_qty, 0, ',', '.') . ' Produk',
+        ];
+    }
+
     /**
-     * Get product distribution per production label for pie chart
+     * Get best-selling products distribution for pie chart
+     * Based on transaction data (product_name from transactions)
      */
     private function getProductionDistribution()
     {
-        $data = Production::withCount('detailProducts')
-            ->get()
-            ->map(function ($prod) {
-                return [
-                    'label' => $prod->production_label,
-                    'count' => $prod->detail_products_count,
-                ];
-            })
-            ->filter(function ($item) {
-                return $item['count'] > 0;
-            })
-            ->values();
+        // Get sales data grouped by product_name from transactions
+        $productSales = Transaction::selectRaw('product_name, SUM(total) as total_sales, SUM(qty) as total_qty, COUNT(*) as transaction_count')
+            ->whereNotNull('product_name')
+            ->where('product_name', '!=', '')
+            ->groupBy('product_name')
+            ->orderBy('total_sales', 'desc')
+            ->limit(10) // Top 10 best-selling products
+            ->get();
+
+        $data = $productSales->map(function ($item) {
+            return [
+                'label' => $item->product_name,
+                'sales' => (int) $item->total_sales,
+                'qty' => (int) $item->total_qty,
+                'count' => (int) $item->transaction_count,
+            ];
+        })->filter(function ($item) {
+            return $item['sales'] > 0;
+        })->values();
 
         return $data;
     }

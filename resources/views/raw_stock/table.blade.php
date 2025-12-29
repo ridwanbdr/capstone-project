@@ -20,9 +20,9 @@
                 <th class="text-end">
                     <span class="fw-semibold text-dark">Harga Satuan</span>
                 </th>
-                <th class="text-end pe-4">
+                {{-- <th class="text-end pe-4">
                     <span class="fw-semibold text-dark">Total Harga</span>
-                </th>
+                </th> --}}
                 <th class="text-center">
                     <span class="fw-semibold text-dark">Aksi</span>
                 </th>
@@ -67,9 +67,9 @@
                     <span class="fw-semibold text-success">Rp {{ number_format($stock->unit_price, 0, ',', '.') }}</span>
                 </td>
 
-                <td class="text-end pe-4">
+                {{-- <td class="text-end pe-4">
                     <span class="fw-bold text-primary">Rp {{ number_format($stock->material_qty * $stock->unit_price, 0, ',', '.') }}</span>
-                </td>
+                </td> --}}
 
                 <td class="text-center">
                     <div class="d-flex gap-2 justify-content-center">
@@ -78,7 +78,7 @@
                                 class="btn btn-sm btn-outline-primary rounded-pill px-3" 
                                 data-bs-toggle="modal" 
                                 data-bs-target="#editModal{{ $stock->material_id }}"
-                                title="Edit">
+                                title="Update Stok">
                             <i class="ti ti-edit"></i>
                         </button>
 
@@ -190,12 +190,12 @@
                                     <label for="addedOn{{ $stock->material_id }}" class="form-label fw-semibold">
                                         <i class="ti ti-calendar me-1 text-primary"></i>Tanggal Input
                                     </label>
-                                    <input name="added_on" 
-                                           required 
-                                           type="date" 
-                                           class="form-control" 
-                                           id="addedOn{{ $stock->material_id }}" 
-                                           value="{{ old('added_on', $stock->added_on) }}">
+                                     <input name="added_on" 
+                                         required 
+                                         type="date" 
+                                         class="form-control" 
+                                         id="addedOn{{ $stock->material_id }}" 
+                                         value="{{ old('added_on', optional($stock->added_on)->format('Y-m-d')) }}">
                                 </div>
 
                                 <div class="modal-footer border-0 pt-3">

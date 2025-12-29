@@ -89,13 +89,6 @@
                             <i class="ti ti-alert-circle me-1"></i>Jatuh tempo tidak boleh sebelum tanggal transaksi.
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Status</label>
-                        <select name="status" id="status" class="form-select" required>
-                            <option value="dibayar">Dibayar</option>
-                            <option value="pending">Pending</option>
-                        </select>
-                    </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg">
                             <i class="ti ti-cloud-upload"></i> Simpan Transaksi
@@ -261,6 +254,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
         cartTotalDisplay.textContent = formatRupiah(total);
         cartTotalInput.value = total;
+        // Auto-fill paid amount if status is "Lunas"
+        if (isPaidSelect && isPaidSelect.value === 'lunas' && total > 0 && paidInput) {
+            paidInput.value = formatToRupiahInput(total);
+        }
     }
 
     function updateCart() {
@@ -297,7 +294,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    isPaidSelect?.addEventListener('change', toggleDueDate);
+    isPaidSelect?.addEventListener('change', () => {
+        toggleDueDate();
+        // Auto-fill paid amount when status is "Lunas"
+        if (isPaidSelect.value === 'lunas') {
+            const total = parseFloat(cartTotalInput.value) || 0;
+            if (total > 0 && paidInput) {
+                paidInput.value = formatToRupiahInput(total);
+            }
+        }
+    });
 
     // validate due date on submit
     document.getElementById('transactionForm')?.addEventListener('submit', (e) => {

@@ -4,9 +4,25 @@
         {{-- Left Column --}}
         <div class="col-lg-6">
             <div class="mb-3">
-                <label for="material_name" class="form-label fw-semibold">
+                <label for="existing_material" class="form-label fw-semibold">
                     <i class="ti ti-tag me-1 text-primary"></i>Nama Material
                 </label>
+
+                <select name="material_id" id="existing_material" class="form-select mb-2">
+                    <option value="">-- Tambah Nama Baru --</option>
+                    @if(isset($materials))
+                        @foreach($materials as $m)
+                            <option value="{{ $m->material_id }}"
+                                    data-name="{{ $m->material_name }}"
+                                    data-satuan="{{ $m->satuan }}"
+                                    data-category="{{ $m->category }}"
+                                    data-unit_price="{{ $m->unit_price }}">
+                                {{ $m->material_name }} - {{ $m->satuan }}
+                            </option>
+                        @endforeach
+                    @endif
+                </select>
+
                 <input type="text" 
                     name="material_name" 
                     id="material_name"
@@ -140,6 +156,10 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const unitPriceInput = document.getElementById('unit_price');
+    const existingSelect = document.getElementById('existing_material');
+    const materialNameInput = document.getElementById('material_name');
+    const categorySelect = document.getElementById('category');
+    const satuanSelect = document.getElementById('satuan');
     
     if (unitPriceInput) {
         // Format saat input
@@ -158,6 +178,58 @@ document.addEventListener('DOMContentLoaded', function() {
                 unitPriceInput.value = priceValue;
             });
         }
+    }
+
+    // Jika user memilih material existing, isi input terkait dan disable editing
+    if (existingSelect) {
+        existingSelect.addEventListener('change', function() {
+            const sel = this.options[this.selectedIndex];
+            const id = this.value;
+
+            if (id) {
+                const name = sel.dataset.name || '';
+                const satuan = sel.dataset.satuan || '';
+                const category = sel.dataset.category || '';
+                const unit_price = sel.dataset.unit_price || '';
+
+                materialNameInput.value = name;
+                materialNameInput.setAttribute('readonly', 'readonly');
+
+                // set category
+                if (category) {
+                    for (let i=0;i<categorySelect.options.length;i++){
+                        if (categorySelect.options[i].value === category) {
+                            categorySelect.selectedIndex = i; break;
+                        }
+                    }
+                    categorySelect.setAttribute('disabled', 'disabled');
+                }
+
+                // set satuan
+                if (satuan) {
+                    for (let i=0;i<satuanSelect.options.length;i++){
+                        if (satuanSelect.options[i].value === satuan) {
+                            satuanSelect.selectedIndex = i; break;
+                        }
+                    }
+                    satuanSelect.setAttribute('disabled', 'disabled');
+                }
+
+                // set unit price (raw number)
+                if (unit_price !== undefined) {
+                    unitPriceInput.value = unit_price;
+                }
+            } else {
+                // new entry: clear and enable
+                materialNameInput.removeAttribute('readonly');
+                materialNameInput.value = '';
+                categorySelect.removeAttribute('disabled');
+                categorySelect.selectedIndex = 0;
+                satuanSelect.removeAttribute('disabled');
+                satuanSelect.selectedIndex = 0;
+                unitPriceInput.value = '';
+            }
+        });
     }
 });
 

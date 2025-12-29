@@ -2,6 +2,9 @@
     <table class="table table-hover align-middle mb-0">
         <thead class="table-light text-center">
             <tr>
+                <th class="ps-4" style="width: 40px;">
+                    <input type="checkbox" id="selectAll" class="form-check-input">
+                </th>
                 <th class="ps-4">
                     <span class="fw-semibold text-dark">Tanggal</span>
                 </th>
@@ -30,7 +33,14 @@
         </thead>
         <tbody>
             @forelse($transactions as $transaction)
+            @php
+                $isPending = strtolower($transaction->status ?? '') === 'pending' || strtolower($transaction->status ?? '') === 'belum_lunas';
+                $isPaid = strtolower($transaction->status ?? '') === 'paid' || strtolower($transaction->status ?? '') === 'dibayar' || strtolower($transaction->status ?? '') === 'lunas';
+            @endphp
             <tr class="border-bottom">
+                <td class="ps-4">
+                    <input type="checkbox" class="form-check-input transaction-checkbox" value="{{ $transaction->transaction_id }}" data-transaction-id="{{ $transaction->transaction_id }}">
+                </td>
                 <td class="ps-4">
                     <div class="d-flex align-items-center">
                         <span class="text-muted">{{ $transaction->date ? \Carbon\Carbon::parse($transaction->date)->format('d M Y') : '-' }}</span>
@@ -39,7 +49,7 @@
 
                 <td>
                     <div class="d-flex align-items-center">
-                        <span class="fw-semibold">{{ $transaction->product_name }}</span>
+                        <span class="fw-semibold text-dark">{{ $transaction->product_name }}</span>
                     </div>
                 </td>
 
@@ -54,9 +64,19 @@
                 </td>
 
                 <td>
-                    <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2">
-                        {{ $transaction->status ?? '-' }}
-                    </span>
+                    @if($isPending)
+                        <span class="badge bg-danger text-white px-3 py-2 fw-semibold">
+                            Pending
+                        </span>
+                    @elseif($isPaid)
+                        <span class="badge bg-success text-white px-3 py-2 fw-semibold">
+                            Paid
+                        </span>
+                    @else
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2">
+                            {{ $transaction->status ?? '-' }}
+                        </span>
+                    @endif
                 </td>
 
                 <td class="text-end">
@@ -72,6 +92,14 @@
                         <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#editModal{{ $transaction->transaction_id }}">
                             <i class="ti ti-edit"></i>
                         </button>
+
+                        {{-- Bulk mark pending for this product as paid --}}
+                        <form action="{{ route('transactions.markPaidByProduct', $transaction->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Tandai semua transaksi pending untuk produk ini sebagai dibayar?');">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3" title="Tandai Semua Dibayar">
+                                <i class="ti ti-wallet"></i>
+                            </button>
+                        </form>
 
                         <form action="{{ route('transactions.destroy', $transaction->transaction_id) }}" method="POST" style="display:inline" onsubmit="return confirm('Hapus transaksi ini?');">
                             @csrf
@@ -163,7 +191,7 @@
 
             @empty
             <tr>
-                <td colspan="8" class="text-center py-5">
+                <td colspan="9" class="text-center py-5">
                     <div class="text-muted">
                         Tidak ada data transaksi
                     </div>
