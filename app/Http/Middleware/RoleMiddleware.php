@@ -29,14 +29,17 @@ class RoleMiddleware
             return $next($request);
         }
 
-        // Check if user has the required role
-        if ($user->role === $role) {
+        // Check if user has the required role (case-insensitive comparison)
+        if (strtolower($user->role) === strtolower($role)) {
             return $next($request);
         }
 
         // Handle multiple roles separated by pipe (e.g., 'admin|warehouse_staff')
         $roles = explode('|', $role);
-        if (in_array($user->role, $roles)) {
+        $userRoleLower = strtolower($user->role);
+        $rolesLower = array_map('strtolower', $roles);
+        
+        if (in_array($userRoleLower, $rolesLower)) {
             return $next($request);
         }
 
