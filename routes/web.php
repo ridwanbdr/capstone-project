@@ -57,9 +57,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Tasks (Admin only for management, assigned users can view their own tasks)
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
-    Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
     Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create')->middleware('role:admin');
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store')->middleware('role:admin');
+    Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy')->middleware('role:admin');
     Route::put('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
     
