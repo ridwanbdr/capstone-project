@@ -432,6 +432,17 @@ class TransactionController extends Controller
     {
         DB::beginTransaction();
         try {
+            // Validate parameter
+            if (empty($avail_stock_id) || !is_numeric($avail_stock_id)) {
+                return redirect()->route('transactions.index')->with('error', 'ID produk tidak valid.');
+            }
+
+            // Verify that the avail stock exists
+            $availStock = AvailStock::find($avail_stock_id);
+            if (!$availStock) {
+                return redirect()->route('transactions.index')->with('error', 'Produk tidak ditemukan.');
+            }
+
             // find transactions for this product that are pending or have unpaid_amount > 0
             $toUpdate = Transaction::where('id', $avail_stock_id)
                 ->where(function($q) {
@@ -457,7 +468,7 @@ class TransactionController extends Controller
             }
 
             DB::commit();
-            return redirect()->back()->with('success', "Berhasil menandai {$count} transaksi sebagai dibayar.");
+            return redirect()->back()->with('success', "Berhasil menandai {$count} transaksi untuk {$availStock->product_name} sebagai dibayar.");
         } catch (Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Gagal menandai transaksi: ' . $e->getMessage());

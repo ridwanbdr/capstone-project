@@ -84,7 +84,7 @@
 
           <!-- Sales Scorecard -->
           <div class="col-lg-4">
-            <div class="card overflow-hidden border-0 shadow-sm h-100">
+            <div class="card overflow-hidden border-0 shadow-sm">
               <div class="card-body p-4 d-flex flex-column">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                   <h5 class="card-title fw-semibold mb-0">
@@ -106,17 +106,13 @@
                 <p class="text-muted mb-0 small">
                   Penjualan dari seluruh transaksi hingga hari ini
                 </p>
-
-                {{-- <div class="mt-auto pt-3 border-top">
-                  <div class="d-flex align-items-center justify-content-between">
-                    <small class="text-muted">Status</small>
-                    <span class="badge bg-success">Aktif</span>
-                  </div>
-                </div> --}}
+                
               </div>
             </div>
           </div>
         </div>
+
+        {{-- Tracking New Order Status --}}
 
         <!--  Row 2: Monthly Bar Chart + Best-Selling Products Pie Chart -->
         <div class="row">
@@ -397,6 +393,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalSales = pieSales.reduce((sum, val) => sum + val, 0);
     const piePercentages = pieSales.map(sales => totalSales > 0 ? (sales / totalSales * 100) : 0);
 
+    // Extended color palette to support top 5 + Others
+    const extendedColorPalette = ['#0d6efd', '#198754', '#ffc107', '#fd7e14', '#6f42c1', '#8b5cf6'];
+
     const pieChartOptions = {
         chart: {
             type: 'pie',
@@ -409,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         },
         labels: pieLabels,
-        colors: ['#0d6efd', '#198754', '#ffc107', '#fd7e14', '#6f42c1', '#e83e8c', '#20c997', '#dc3545', '#0dcaf0', '#6610f2'],
+        colors: extendedColorPalette.slice(0, pieLabels.length),
         series: pieSales,
         legend: {
             position: 'bottom',

@@ -107,12 +107,14 @@
                         </button>
 
                         {{-- Bulk mark pending for this product as paid --}}
+                        @if($transaction->id)
                         <form action="{{ route('transactions.markPaidByProduct', $transaction->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Tandai semua transaksi pending untuk produk ini sebagai dibayar?');">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3" title="Tandai Semua Dibayar">
                                 <i class="ti ti-wallet"></i>
                             </button>
                         </form>
+                        @endif
 
                         <form action="{{ route('transactions.destroy', $transaction->transaction_id) }}" method="POST" style="display:inline" onsubmit="return confirm('Hapus transaksi ini?');">
                             @csrf
@@ -138,15 +140,15 @@
     </table>
 </div>
 
-{{-- Pagination --}}
+{{-- Pagination
 
 @if(isset($transactions) && $transactions->hasPages())
-<div class="card-footer bg-white border-top py-3">
+<div class="card-footer bg-white border-top py-2">
     <div class="d-flex justify-content-center">
         {{ $transactions->links() }}
     </div>
 </div>
-@endif
+@endif   --}}
 
 {{-- Reusable Edit Modal --}}
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -294,3 +296,37 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+<style>
+/* Compact pagination styling */
+.pagination {
+    margin: 0;
+    gap: 0.25rem;
+}
+
+.pagination .page-link {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.875rem;
+    border-radius: 0.25rem;
+    border: 1px solid #dee2e6;
+    color: #0d6efd;
+    min-width: auto;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    font-weight: 500;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.pagination .page-link:hover:not(.disabled) {
+    background-color: #e7f1ff;
+    border-color: #0d6efd;
+}
+</style>

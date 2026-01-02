@@ -34,7 +34,7 @@ class RoleMiddleware
             return $next($request);
         }
 
-        // Handle multiple roles separated by pipe (e.g., 'admin|warehouse_staff')
+        // Handle multiple roles separated by pipe (e.g., 'admin|staff_operasional')
         $roles = explode('|', $role);
         $userRoleLower = strtolower($user->role);
         $rolesLower = array_map('strtolower', $roles);

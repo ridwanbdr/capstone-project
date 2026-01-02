@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use App\Models\DetailProduct;
 use App\Models\Production;
 use App\Models\RawStock;
+use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -33,13 +34,17 @@ class DashboardController extends Controller
         // Latest transactions (last 5)
         $latestTransactions = $this->getLatestTransactions();
 
+        // Order status distribution for pie chart
+        $orderStatusData = $this->getOrderStatusData();
+
         return view('dashboard.index', compact(
             'monthlyData',
             'totalSales',
             'totalQuantityProductSold',
             'productionDistribution',
             'latestRawStocks',
-            'latestTransactions'
+            'latestTransactions',
+            'orderStatusData'
         ));
     }
 
@@ -117,22 +122,26 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get total sales amount
+     * Get total sales amount from last 30 days
      */
     private function getTotalSales()
     {
-        $total = Transaction::sum('total') ?? 0;
+        $thirtyDaysAgo = now()->subDays(30);
+        $total = Transaction::where('created_at', '>=', $thirtyDaysAgo)->sum('total') ?? 0;
         return [
             'amount' => (int) $total,
-            'count' => Transaction::count(),
+            'count' => Transaction::where('created_at', '>=', $thirtyDaysAgo)->count(),
             'formatted' => 'Rp ' . number_format($total, 0, ',', '.'),
         ];
     }
 
-    // Sum Quantity Product Sold
+    /**
+     * Sum Quantity Product Sold from last 30 days
+     */
     private function getTotalQuantityProductSold()
     {
-        $total_qty = Transaction::sum('qty') ?? 0;
+        $thirtyDaysAgo = now()->subDays(30);
+        $total_qty = Transaction::where('created_at', '>=', $thirtyDaysAgo)->sum('qty') ?? 0;
         return [
             'qty' => (int) $total_qty,
             'formatted' => number_format($total_qty, 0, ',', '.') . ' Produk',
@@ -141,20 +150,21 @@ class DashboardController extends Controller
 
     /**
      * Get best-selling products distribution for pie chart
+     * Returns top 5 products plus "Others" aggregation to prevent chart clutter
      * Based on transaction data (product_name from transactions)
      */
     private function getProductionDistribution()
     {
-        // Get sales data grouped by product_name from transactions
-        $productSales = Transaction::selectRaw('product_name, SUM(total) as total_sales, SUM(qty) as total_qty, COUNT(*) as transaction_count')
+        // Get ALL sales data grouped by product_name from transactions
+        $allProductSales = Transaction::selectRaw('product_name, SUM(total) as total_sales, SUM(qty) as total_qty, COUNT(*) as transaction_count')
             ->whereNotNull('product_name')
             ->where('product_name', '!=', '')
             ->groupBy('product_name')
             ->orderBy('total_sales', 'desc')
-            ->limit(10) // Top 10 best-selling products
             ->get();
 
-        $data = $productSales->map(function ($item) {
+        // Format all products
+        $formattedSales = $allProductSales->map(function ($item) {
             return [
                 'label' => $item->product_name,
                 'sales' => (int) $item->total_sales,
@@ -165,7 +175,31 @@ class DashboardController extends Controller
             return $item['sales'] > 0;
         })->values();
 
-        return $data;
+        // If 5 or fewer products, return as-is
+        if ($formattedSales->count() <= 5) {
+            return $formattedSales;
+        }
+
+        // Get top 5 products
+        $topFive = $formattedSales->take(5);
+
+        // Calculate sum of remaining products
+        $othersData = $formattedSales->slice(5);
+        $othersSales = $othersData->sum('sales');
+        $othersQty = $othersData->sum('qty');
+        $othersCount = $othersData->count();
+
+        // Add "Others" category if there are remaining products
+        if ($othersSales > 0) {
+            $topFive->push([
+                'label' => 'Lainnya',
+                'sales' => (int) $othersSales,
+                'qty' => (int) $othersQty,
+                'count' => (int) $othersCount,
+            ]);
+        }
+
+        return $topFive;
     }
 
     /**
@@ -216,5 +250,31 @@ class DashboardController extends Controller
                     'cart_total' => $trans->total,
                 ];
             });
+    }
+
+    /**
+     * Get order status distribution for pie chart
+     */
+    private function getOrderStatusData()
+    {
+        $statusCounts = Order::selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->get()
+            ->pluck('count', 'status')
+            ->toArray();
+
+        // Ensure all statuses are present with 0 if no data
+        $allStatuses = ['incoming', 'process', 'pending', 'complete'];
+        $data = [];
+        
+        foreach ($allStatuses as $status) {
+            $data[] = [
+                'status' => $status,
+                'count' => isset($statusCounts[$status]) ? (int) $statusCounts[$status] : 0,
+                'label' => ucfirst($status),
+            ];
+        }
+
+        return $data;
     }
 }

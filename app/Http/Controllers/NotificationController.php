@@ -52,7 +52,7 @@ class NotificationController extends Controller
         $notification->read_at = now();
         $notification->save();
 
-        return response()->json(['success' => true]);
+        return redirect()->back()->with('success', 'Notifikasi ditandai sebagai dibaca.');
     }
 
     /**

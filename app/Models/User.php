@@ -112,11 +112,11 @@ class User extends Authenticatable
     }
     
     /**
-     * Check if user is warehouse staff.
+     * Check if user is staff operasional.
      */
-    public function isWarehouseStaff(): bool
+    public function isStaffOperasional(): bool
     {
-        return !empty($this->role) && strtolower($this->role) === 'warehouse_staff';
+        return !empty($this->role) && strtolower($this->role) === 'staff_operasional';
     }
     
     /**

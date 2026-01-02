@@ -99,7 +99,7 @@
                 @if(!Auth::user()->isAdmin() && $task->assigned_to === Auth::id())
                 <div class="border-top pt-3 mt-3">
                     <label class="form-label fw-semibold">Update Status</label>
-                    <form action="{{ route('tasks.updateStatus', $task) }}" method="POST" class="d-flex gap-2">
+                    <form action="{{ route('tasks.updateStatus', $task) }}" method="POST" class="d-flex gap-2" id="taskStatusForm">
                         @csrf
                         @method('PUT')
                         <select name="status" class="form-select" required>
