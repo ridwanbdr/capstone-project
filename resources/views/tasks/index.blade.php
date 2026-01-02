@@ -100,14 +100,24 @@
                                 </td>
                                 <td class="text-end">
                                     <div class="d-flex gap-2 justify-content-end">
-                                        <a href="{{ route('tasks.show', $task) }}" class="btn btn-sm btn-outline-primary">
+                                        <a href="{{ route('tasks.show', $task) }}" class="btn btn-sm btn-outline-primary" title="View Details">
                                             <i class="ti ti-eye"></i>
                                         </a>
+                                        @if(!Auth::user()->isAdmin() && $task->assigned_to === Auth::id() && $task->status !== 'completed')
+                                        <form action="{{ route('tasks.updateStatus', $task) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="status" value="completed">
+                                            <button type="submit" class="btn btn-sm btn-outline-success" title="Mark as Completed" onclick="return confirm('Tandai task sebagai selesai?');">
+                                                <i class="ti ti-check"></i>
+                                            </button>
+                                        </form>
+                                        @endif
                                         @if(Auth::user()->isAdmin())
-                                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Hapus task ini?');">
+                                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" style="display:inline;" onsubmit="return confirm('Hapus task ini?');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
                                                 <i class="ti ti-trash"></i>
                                             </button>
                                         </form>

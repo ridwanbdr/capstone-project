@@ -45,7 +45,7 @@ class UserController extends Controller
             'nama_lengkap' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
-            'role' => ['required', Rule::in(['admin', 'warehouse_staff', 'qc_staff'])],
+            'role' => ['required', Rule::in(['admin', 'staff_operasional', 'qc_staff'])],
         ]);
 
         $user = User::create([
@@ -98,7 +98,7 @@ class UserController extends Controller
             'nama_lengkap' => 'required|string|max:255',
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:6|confirmed',
-            'role' => ['required', Rule::in(['admin', 'warehouse_staff', 'qc_staff'])],
+            'role' => ['required', Rule::in(['admin', 'staff_operasional', 'qc_staff'])],
         ]);
 
         $user->username = $validated['username'];

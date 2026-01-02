@@ -25,11 +25,11 @@ class RawStockController extends Controller
             if ($user->isAdmin()) {
                 return $next($request);
             }
-            // Warehouse Staff can access
-            if ($user->isWarehouseStaff()) {
+            // Staff Operasional can access
+            if ($user->isStaffOperasional()) {
                 return $next($request);
             }
-            abort(403, 'Unauthorized access. Only Admin and Warehouse Staff can access this module.');
+            abort(403, 'Unauthorized access. Only Admin and Staff Operasional can access this module.');
         });
     }
 

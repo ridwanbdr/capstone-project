@@ -120,8 +120,12 @@ class TaskController extends Controller
 
         $validated = $request->validate([
             'status' => 'required|in:pending,in_progress,completed,cancelled',
+        ], [
+            'status.required' => 'Status wajib dipilih.',
+            'status.in' => 'Status tidak valid.',
         ]);
 
+        $oldStatus = $task->status;
         $task->update(['status' => $validated['status']]);
 
         if ($validated['status'] === 'completed') {
@@ -136,9 +140,21 @@ class TaskController extends Controller
                 'message' => "Task '{$task->title}' telah diselesaikan oleh $userName",
                 'task_id' => $task->id,
             ]);
+
+            return redirect()->route('tasks.show', $task)->with('success', 'Task berhasil ditandai sebagai selesai.');
+        } elseif ($oldStatus !== $validated['status']) {
+            // Notify admin of status change
+            $statusLabel = str_replace('_', ' ', $validated['status']);
+            Notification::create([
+                'user_id' => $task->assigned_by,
+                'type' => 'task_status_changed',
+                'title' => 'Status Task Berubah',
+                'message' => "Task '{$task->title}' status berubah menjadi: " . ucfirst($statusLabel),
+                'task_id' => $task->id,
+            ]);
         }
 
-        return redirect()->back()->with('success', 'Status task berhasil diperbarui.');
+        return redirect()->route('tasks.show', $task)->with('success', 'Status task berhasil diperbarui.');
     }
 
     /**

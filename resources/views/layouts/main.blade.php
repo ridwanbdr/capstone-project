@@ -50,12 +50,12 @@
             @php
               $user = Auth::user();
               $isAdmin = $user && $user->isAdmin();
-              $isWarehouseStaff = $user && $user->isWarehouseStaff();
+              $isStaffOperasional = $user && $user->isStaffOperasional();
               $isQcStaff = $user && $user->isQcStaff();
             @endphp
 
-            {{-- Bahan Baku - Admin & Warehouse Staff --}}
-            @if($isAdmin || $isWarehouseStaff)
+            {{-- Bahan Baku - Admin & Staff Operasional --}}
+            @if($isAdmin || $isStaffOperasional)
             <li class="sidebar-item">
               <a class="sidebar-link" href="{{ route('raw_stock.index') }}" aria-expanded="false">
                 <span>
@@ -66,8 +66,8 @@
             </li>
             @endif
 
-            {{-- Produksi - Admin & Warehouse Staff --}}
-            @if($isAdmin || $isWarehouseStaff)
+            {{-- Produksi - Admin & Staff Operasional --}}
+            @if($isAdmin || $isStaffOperasional)
             <li class="sidebar-item">
               <a class="sidebar-link" href="{{ route('production.index') }}" aria-expanded="false">
                 <span>
@@ -78,8 +78,8 @@
             </li>
             @endif
 
-            {{-- Detail Produk - Admin only --}}
-            @if($isAdmin)
+            {{-- Detail Produk - Admin & Staff Operasional --}}
+            @if($isAdmin || $isStaffOperasional)
             <li class="sidebar-item">
               <a class="sidebar-link" href="{{ route('detail_product.index') }}" aria-expanded="false">
                 <span>
@@ -113,6 +113,16 @@
               </a>
             </li>
             @endif
+
+            {{-- Kelola Order - All users --}}
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{{ route('orders.index') }}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-shopping-cart"></i>
+                </span>
+                <span class="hide-menu">Kelola Order</span>
+              </a>
+            </li>
 
             {{-- Admin Only Menu --}}
             @if($isAdmin)
@@ -180,8 +190,8 @@
                       <small class="text-muted">
                         @if(Auth::user()->isAdmin())
                           Administrator
-                        @elseif(Auth::user()->isWarehouseStaff())
-                          Warehouse Staff
+                        @elseif(Auth::user()->isStaffOperasional())
+                          Staff Operasional
                         @elseif(Auth::user()->isQcStaff())
                           QC Staff
                         @endif

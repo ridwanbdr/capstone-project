@@ -19,11 +19,14 @@ class DetailProductController extends Controller
             if (!$user) {
                 return redirect()->route('login')->with('error', 'Please login to continue.');
             }
-            // Only Admin can access
-            if (!$user->isAdmin()) {
-                abort(403, 'Unauthorized access. Only Admin can access this module.');
+            // Admin and Staff Operasional can access
+            if ($user->isAdmin()) {
+                return $next($request);
             }
-            return $next($request);
+            if ($user->isStaffOperasional()) {
+                return $next($request);
+            }
+            abort(403, 'Unauthorized access. Only Admin and Staff Operasional can access this module.');
         });
     }
 

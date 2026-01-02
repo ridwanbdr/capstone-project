@@ -11,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\OrderController;
 
 // Auth routes (no middleware)
 Route::get('/login', [HomeController::class, 'login'])->name('login');
@@ -27,7 +28,7 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard - accessible to all authenticated users
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     
-    // Raw Stock & Production - Admin & Warehouse Staff (role check in controller)
+    // Raw Stock & Production - Admin & Staff Operasional (role check in controller)
     Route::resource('raw_stock', RawStockController::class);
     Route::resource('production', ProductionController::class);
     
@@ -62,6 +63,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy')->middleware('role:admin');
     Route::put('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+    
+    // Kelola Order (all authenticated users)
+    Route::resource('orders', OrderController::class);
     
     // Notifications (all authenticated users)
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
