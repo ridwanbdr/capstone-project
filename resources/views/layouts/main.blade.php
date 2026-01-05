@@ -174,7 +174,7 @@
     <!--  Main wrapper -->
     <div class="body-wrapper">
       <!--  Header Start -->
-      <header class="app-header">
+      <header class="app-header header shadow-sm">
         <nav class="navbar navbar-expand-lg navbar-light">
           <ul class="navbar-nav">
             <li class="nav-item d-block d-xl-none">
@@ -246,7 +246,7 @@
         </nav>
       </header>
       <!--  Header End -->
-      <div class="container-fluid b">
+      <div class="container-fluid">
         @yield('content')
       </div>
     </div>
@@ -268,7 +268,7 @@
     
     .card:hover {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-      border-color: #0d6efd !important;
+      border-color: #57c4ff !important;
       transform: translateY(-2px);
     }
     

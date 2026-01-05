@@ -140,7 +140,7 @@
     </table>
 </div>
 
-{{-- Pagination
+{{-- Pagination --}}
 
 @if(isset($transactions) && $transactions->hasPages())
 <div class="card-footer bg-white border-top py-2">
@@ -148,7 +148,7 @@
         {{ $transactions->links() }}
     </div>
 </div>
-@endif   --}}
+@endif  
 
 {{-- Reusable Edit Modal --}}
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">

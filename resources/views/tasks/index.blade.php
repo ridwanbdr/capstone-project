@@ -19,7 +19,7 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row mt-4">
     <div class="col-12">
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
@@ -33,7 +33,7 @@
             <div class="card-header bg-white border-bottom py-3">
                 <div class="d-flex align-items-center">
                     <i class="ti ti-clipboard-list me-2 text-primary fs-5"></i>
-                    <h5 class="mb-0 fw-semibold">{{ Auth::user()->isAdmin() ? 'Daftar Semua Task' : 'My Task' }}</h5>
+                    <h5 class="mb-0 fw-semibold">{{ Auth::user()->isAdmin() ? 'Daftar Task Karyawan' : 'My Task' }}</h5>
                 </div>
             </div>
             <div class="card-body p-0">

@@ -1,0 +1,193 @@
+// ============================================
+// SISTEM MANAJEMEN STOK DAN PRODUKSI UMKM
+// Entity Relationship Diagram (ERD)
+// ============================================
+
+Table users {
+  id INT [pk, increment]
+  name varchar
+  email varchar [unique]
+  email_verified_at datetime [null]
+  password varchar
+  remember_token varchar [null]
+  role enum [note: 'admin, staff operasional, QC staff, karyawan']
+  nama_lengkap varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table tasks {
+  task_id INT [pk, increment]
+  title varchar
+  description text
+  assigned_by INT [ref: > users.id, note: 'Admin yang membuat task']
+  assigned_to INT [ref: > users.id, note: 'Karyawan yang ditugaskan']
+  priority enum [note: 'low, medium, high']
+  status enum [note: 'pending, in_progress, completed, cancelled']
+  due_date date
+  completed_at datetime [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table notifications {
+  id INT [pk, increment]
+  user_id INT [ref: > users.id]
+  type varchar [note: 'task_assigned, task_completed, task_status_changed']
+  title varchar
+  message text
+  task_id INT [ref: > tasks.task_id, null]
+  is_read boolean [default: false]
+  read_at datetime [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table raw_stocks {
+  material_id INT [pk, increment]
+  material_name varchar
+  material_qty int [note: 'Jumlah stok saat ini']
+  unit_price int
+  total_price int [note: 'material_qty * unit_price']
+  added_on date
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table raw_stock_transactions {
+  transaction_id INT [pk, increment]
+  material_id INT [ref: > raw_stocks.material_id]
+  quantity int
+  transaction_date date
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table productions {
+  production_id INT [pk, increment]
+  production_lead varchar
+  production_label varchar [note: 'Nama batch produksi']
+  date date
+  material_id INT [ref: > raw_stocks.material_id]
+  material_name varchar
+  material_used_qty int
+  total_unit int [note: 'Target jumlah produk']
+  status enum [note: 'planning, in_progress, completed, cancelled']
+  start_date date
+  end_date date [null]
+  batch_number varchar
+  quantity_target int
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table detail_products {
+  product_detail_id INT [pk, increment]
+  production_id INT [ref: > productions.production_id]
+  production_label varchar
+  product_name varchar
+  size_id INT [ref: > sizes.size_id]
+  size_label varchar
+  qty_produced int
+  qty_unit int [note: 'Jumlah unit per size']
+  price_unit int
+  quantity_available int
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table qc_checks {
+  qc_id INT [pk, increment]
+  production_id INT [ref: > productions.production_id]
+  product_detail_id INT [ref: > detail_products.product_detail_id, null]
+  qc_label varchar [note: 'Nama proses QC']
+  date date
+  qc_checker varchar [note: 'Nama orang yang melakukan QC']
+  product_name varchar
+  qty_passed int
+  qty_reject int
+  quality_status enum [note: 'pass, fail']
+  notes text [null]
+  checked_by INT [ref: > users.id, null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table sizes {
+  size_id INT [pk, increment]
+  size_label varchar [note: 'S, M, L, XL, dll']
+  width int [null]
+  height int [null]
+  sleeve int [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table avail_stocks {
+  id INT [pk, increment]
+  product_detail_id INT [ref: > detail_products.product_detail_id]
+  product_name varchar
+  size_id INT [ref: > sizes.size_id]
+  size_label varchar
+  qty_unit int [note: 'Jumlah stok tersedia']
+  price_unit int
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table transactions {
+  transaction_id INT [pk, increment]
+  date date
+  avail_stock_id INT [ref: > avail_stocks.id]
+  product_name varchar
+  size_label varchar
+  qty int
+  price int [note: 'Harga satuan']
+  total int [note: 'qty * price']
+  paid int [note: 'Jumlah yang dibayar']
+  payment_method varchar
+  unpaid_amount int [note: 'Sisa pembayaran']
+  is_paid enum [note: 'lunas, belum_lunas']
+  status varchar
+  due_date_payment date [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table orders {
+  order_id INT [pk, increment]
+  customer_name varchar
+  customer_contact varchar
+  status enum [note: 'incoming, process, pending, complete']
+  order_date date
+  due_date date
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table order_items {
+  item_id INT [pk, increment]
+  order_id INT [ref: > orders.order_id]
+  product_name varchar
+  quantity int
+  unit_price int
+  total_price int
+  created_at timestamp
+  updated_at timestamp
+}
+
+// ============================================
+// RELATIONSHIP SUMMARY
+// ============================================
+// Users (1) --< (N) Tasks (assigned_by & assigned_to)
+// Users (1) --< (N) Notifications
+// Tasks (1) --< (N) Notifications
+// Raw Stocks (1) --< (N) Raw Stock Transactions
+// Raw Stocks (1) --< (N) Productions
+// Productions (1) --< (N) Detail Products
+// Productions (1) --< (N) QC Checks
+// Detail Products (1) --< (N) Avail Stocks
+// Sizes (1) --< (N) Detail Products
+// Sizes (1) --< (N) Avail Stocks
+// Avail Stocks (1) --< (N) Transactions
+// Orders (1) --< (N) Order Items
