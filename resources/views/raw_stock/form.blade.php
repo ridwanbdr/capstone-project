@@ -144,7 +144,7 @@
                 <button type="reset" class="btn btn-outline-secondary px-4">
                     <i class="ti ti-refresh"></i>Reset
                 </button>
-                <button type="submit" class="btn btn-primary px-5 shadow-sm">
+                <button type="submit" class="btn btn-primary px-5 shadow-sm" id="submitBtn">
                     <i class="ti ti-plus"></i>Tambah Material
                 </button>
             </div>
@@ -152,7 +152,42 @@
     </div>
 </form>
 
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 {{-- Script untuk format rupiah --}}
+<script>
+// Tampilkan alert sukses jika ada pesan success dari session
+@if(session('success'))
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            icon: 'success',
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '{{ route('raw_stock.index') }}';
+            }
+        });
+    });
+@endif
+
+// Tampilkan alert error jika ada pesan error dari session
+@if(session('error'))
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            icon: 'error',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'OK'
+        });
+    });
+@endif
+</script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const unitPriceInput = document.getElementById('unit_price');
@@ -160,6 +195,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const materialNameInput = document.getElementById('material_name');
     const categorySelect = document.getElementById('category');
     const satuanSelect = document.getElementById('satuan');
+    const form = document.getElementById('rawStockForm');
+    const submitBtn = document.getElementById('submitBtn');
     
     if (unitPriceInput) {
         // Format saat input
@@ -171,11 +208,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Konversi kembali ke angka saat submit
-        const form = document.getElementById('rawStockForm');
         if (form) {
             form.addEventListener('submit', function(e) {
-                const priceValue = unitPriceInput.value.replace(/\./g, '');
-                unitPriceInput.value = priceValue;
+                e.preventDefault();
+                
+                // Validasi form
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                const materialName = materialNameInput.value;
+                const category = categorySelect.value;
+                const quantity = document.getElementById('material_qty').value;
+                const satuan = satuanSelect.value;
+
+                // Konfirmasi dengan SweetAlert
+                Swal.fire({
+                    title: 'Konfirmasi Tambah Material',
+                    html: `
+                        <div style="text-align: left; margin: 20px 0;">
+                            <p><strong>Material:</strong> ${materialName}</p>
+                            <p><strong>Kategori:</strong> ${category}</p>
+                            <p><strong>Quantity:</strong> ${quantity} ${satuan}</p>
+                        </div>
+                    `,
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0d6efd',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Tambahkan',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const priceValue = unitPriceInput.value.replace(/\./g, '');
+                        unitPriceInput.value = priceValue;
+                        
+                        // Submit form
+                        form.submit();
+                    }
+                });
             });
         }
     }

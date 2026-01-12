@@ -67,7 +67,9 @@
 
                         <form action="{{ route('detail_product.destroy', ['detail_product' => $item->product_id]) }}"
                               method="POST"
-                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                              style="display:inline"
+                              class="deleteForm"
+                              data-product-name="{{ $item->product_name }}">
                             @csrf
                             @method('DELETE')
                             <button type="submit"
@@ -149,3 +151,38 @@
     </div>
 </div>
 @endif
+
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteForms = document.querySelectorAll('.deleteForm');
+
+    deleteForms.forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const productName = form.getAttribute('data-product-name');
+
+            Swal.fire({
+                title: 'Hapus Produk?',
+                html: `
+                    <p>Apakah Anda yakin ingin menghapus produk:</p>
+                    <p style="font-weight: bold; color: #0d6efd;">${productName}</p>
+                    <p style="font-size: 12px; color: #dc3545;"><i class="ti ti-alert-circle"></i> Tindakan ini tidak dapat dibatalkan</p>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>

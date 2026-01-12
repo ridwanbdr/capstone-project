@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="card-body p-4">
-                    <form action="{{ route('raw_stock.update', $stock->material_id) }}" method="POST">
+                    <form action="{{ route('raw_stock.update', $stock->material_id) }}" method="POST" id="editRawStockForm">
                         @csrf
                         @method('PUT')
 
@@ -156,7 +156,7 @@
                             <a href="{{ route('raw_stock.index') }}" class="btn btn-outline-secondary px-4">
                                 <i class="ti ti-arrow-left"></i> Kembali
                             </a>
-                            <button type="submit" class="btn btn-primary px-5 shadow-sm">
+                            <button type="submit" class="btn btn-primary px-5 shadow-sm" id="submitBtn">
                                 <i class="ti ti-check"></i> Simpan Perubahan
                             </button>
                         </div>
@@ -165,6 +165,83 @@
             </div>
         </div>
     </div>
+
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editRawStockForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Tampilkan alert sukses jika ada pesan success dari session
+    @if(session('success'))
+        Swal.fire({
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            icon: 'success',
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '{{ route('raw_stock.index') }}';
+            }
+        });
+    @endif
+
+    // Tampilkan alert error jika ada pesan error dari session
+    @if(session('error'))
+        Swal.fire({
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            icon: 'error',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'OK'
+        });
+    @endif
+
+    // Konfirmasi sebelum update
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validasi form
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const materialName = document.querySelector('input[name="material_name"]').value;
+            const category = document.querySelector('select[name="category"]').value;
+            const quantity = document.querySelector('input[name="material_qty"]').value;
+            const satuan = document.querySelector('select[name="satuan"]').value;
+
+            // Konfirmasi dengan SweetAlert
+            Swal.fire({
+                title: 'Konfirmasi Update Material',
+                html: `
+                    <div style="text-align: left; margin: 20px 0;">
+                        <p><strong>Material:</strong> ${materialName}</p>
+                        <p><strong>Kategori:</strong> ${category}</p>
+                        <p><strong>Quantity:</strong> ${quantity} ${satuan}</p>
+                    </div>
+                `,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Update',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit form
+                    form.submit();
+                }
+            });
+        });
+    }
+});
+</script>
 @endsection
 
 

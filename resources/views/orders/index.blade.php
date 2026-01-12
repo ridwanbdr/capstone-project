@@ -77,7 +77,7 @@
                                         <a href="{{ route('orders.edit', $order) }}" class="btn btn-sm btn-outline-info">
                                             <i class="ti ti-edit"></i>
                                         </a>
-                                        <form action="{{ route('orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Hapus order ini?');">
+                                        <form action="{{ route('orders.destroy', $order) }}" method="POST" style="display:inline" class="deleteOrderForm" data-customer-name="{{ $order->customer_name }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger">
@@ -102,5 +102,40 @@
         </div>
     </div>
 </div>
+
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteOrderForms = document.querySelectorAll('.deleteOrderForm');
+
+    deleteOrderForms.forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const customerName = form.getAttribute('data-customer-name');
+
+            Swal.fire({
+                title: 'Hapus Order?',
+                html: `
+                    <p>Apakah Anda yakin ingin menghapus order dari customer:</p>
+                    <p style="font-weight: bold; color: #0d6efd;">${customerName}</p>
+                    <p style="font-size: 12px; color: #dc3545;"><i class="ti ti-alert-circle"></i> Tindakan ini tidak dapat dibatalkan</p>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
 @endsection
 

@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="card-body p-4">
-                <form action="{{ route('tasks.store') }}" method="POST">
+                <form action="{{ route('tasks.store') }}" method="POST" id="createTaskForm">
                     @csrf
 
                     <div class="mb-3">
@@ -83,7 +83,7 @@
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
                             <i class="ti ti-device-floppy"></i> Simpan Task
                         </button>
                         <a href="{{ route('tasks.index') }}" class="btn btn-outline-secondary">
@@ -95,5 +95,63 @@
         </div>
     </div>
 </div>
+
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    @if(session('success'))
+        Swal.fire({
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            icon: 'success',
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '{{ route('tasks.index') }}';
+            }
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            icon: 'error',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'OK'
+        });
+    @endif
+
+    const form = document.getElementById('createTaskForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const taskTitle = document.querySelector('input[name="title"]').value;
+
+        Swal.fire({
+            title: 'Konfirmasi Tambah Task',
+            html: `<p>Apakah Anda yakin ingin membuat task <strong>${taskTitle}</strong>?</p>`,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Simpan',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+});
+</script>
 @endsection
 

@@ -151,11 +151,83 @@
         <a href="{{ route('qc_check.index') }}" class="btn btn-outline-secondary px-4">
             <i class="ti ti-arrow-left"></i> Kembali
         </a>
-        <button type="submit" class="btn btn-primary px-5 shadow-sm">
+        <button type="submit" class="btn btn-primary px-5 shadow-sm" id="submitBtn">
             <i class="ti ti-check"></i> {{ isset($qcCheck) ? 'Perbarui' : 'Simpan' }}
         </button>
     </div>
 </form>
+
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('qcCheckForm');
+
+    @if(session('success'))
+        Swal.fire({
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            icon: 'success',
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '{{ route('qc_check.index') }}';
+            }
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            icon: 'error',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'OK'
+        });
+    @endif
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const qcChecker = document.querySelector('input[name="qc_checker"]').value;
+        const productSelect = document.getElementById('product_id');
+        const productName = productSelect.options[productSelect.selectedIndex].getAttribute('data-product-name');
+
+        const isUpdate = form.querySelector('input[name="_method"]')?.value === 'PUT';
+        const title = isUpdate ? 'Konfirmasi Update QC Check' : 'Konfirmasi Tambah QC Check';
+        const confirmText = isUpdate ? 'Ya, Update' : 'Ya, Simpan';
+
+        Swal.fire({
+            title: title,
+            html: `
+                <div style="text-align: left; margin: 20px 0;">
+                    <p><strong>Produk:</strong> ${productName}</p>
+                    <p><strong>QC Checker:</strong> ${qcChecker}</p>
+                </div>
+            `,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: confirmText,
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+});
+</script>
+@endpush
 
 @push('scripts')
 <script>

@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="card-body p-4">
-                <form action="{{ route('users.store') }}" method="POST">
+                <form action="{{ route('users.store') }}" method="POST" id="createUserForm">
                     @csrf
 
                     <div class="row mb-3">
@@ -85,7 +85,7 @@
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
                             <i class="ti ti-device-floppy"></i> Simpan
                         </button>
                         <a href="{{ route('users.index') }}" class="btn btn-outline-secondary">
@@ -97,5 +97,69 @@
         </div>
     </div>
 </div>
+
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    @if(session('success'))
+        Swal.fire({
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            icon: 'success',
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '{{ route('users.index') }}';
+            }
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            icon: 'error',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'OK'
+        });
+    @endif
+
+    const form = document.getElementById('createUserForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const username = document.querySelector('input[name="username"]').value;
+        const role = document.querySelector('select[name="role"]').value;
+
+        Swal.fire({
+            title: 'Konfirmasi Tambah Akun',
+            html: `
+                <div style="text-align: left; margin: 20px 0;">
+                    <p><strong>Username:</strong> ${username}</p>
+                    <p><strong>Role:</strong> ${role}</p>
+                </div>
+            `,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Simpan',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+});
+</script>
 @endsection
 

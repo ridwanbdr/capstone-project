@@ -114,7 +114,7 @@
                                         </form>
                                         @endif
                                         @if(Auth::user()->isAdmin())
-                                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" style="display:inline;" onsubmit="return confirm('Hapus task ini?');">
+                                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" style="display:inline;" class="deleteTaskForm" data-task-title="{{ $task->title }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
@@ -140,5 +140,39 @@
         </div>
     </div>
 </div>
-@endsection
 
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteTaskForms = document.querySelectorAll('.deleteTaskForm');
+    
+    deleteTaskForms.forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const taskTitle = form.getAttribute('data-task-title');
+            
+            Swal.fire({
+                title: 'Hapus Task?',
+                html: `
+                    <p>Apakah Anda yakin ingin menghapus task:</p>
+                    <p style="font-weight: bold; color: #0d6efd;">${taskTitle}</p>
+                    <p style="font-size: 12px; color: #dc3545;"><i class="ti ti-alert-circle"></i> Tindakan ini tidak dapat dibatalkan</p>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
+@endsection

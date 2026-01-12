@@ -26,7 +26,7 @@
                 </div>
             </div>
             <div class="card-body p-4">
-                <form action="{{ route('orders.update', $order) }}" method="POST">
+                <form action="{{ route('orders.update', $order) }}" method="POST" id="editOrderForm">
                     @csrf
                     @method('PUT')
 
@@ -231,5 +231,63 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
+
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    @if(session('success'))
+        Swal.fire({
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            icon: 'success',
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '{{ route('orders.index') }}';
+            }
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            icon: 'error',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'OK'
+        });
+    @endif
+
+    const form = document.getElementById('editOrderForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const customerName = document.querySelector('input[name="customer_name"]').value;
+
+        Swal.fire({
+            title: 'Konfirmasi Update Order',
+            html: `<p>Apakah Anda yakin ingin mengupdate order untuk customer <strong>${customerName}</strong>?</p>`,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Update',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+});
+</script>
 @endsection
 

@@ -77,7 +77,7 @@
                                         <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">
                                             <i class="ti ti-edit"></i>
                                         </a>
-                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Hapus akun ini?');">
+                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline" class="deleteUserForm" data-username="{{ $user->username }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger">
@@ -102,5 +102,40 @@
         </div>
     </div>
 </div>
+
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteUserForms = document.querySelectorAll('.deleteUserForm');
+
+    deleteUserForms.forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = form.getAttribute('data-username');
+
+            Swal.fire({
+                title: 'Hapus Akun?',
+                html: `
+                    <p>Apakah Anda yakin ingin menghapus akun:</p>
+                    <p style="font-weight: bold; color: #0d6efd;">${username}</p>
+                    <p style="font-size: 12px; color: #dc3545;"><i class="ti ti-alert-circle"></i> Tindakan ini tidak dapat dibatalkan</p>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
 @endsection
 

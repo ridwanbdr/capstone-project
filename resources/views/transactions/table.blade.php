@@ -97,7 +97,7 @@
 
                         {{-- Bulk mark pending for this product as paid --}}
                         @if($transaction->id)
-                        <form action="{{ route('transactions.markPaidByProduct', $transaction->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Tandai semua transaksi pending untuk produk ini sebagai dibayar?');">
+                        <form action="{{ route('transactions.markPaidByProduct', $transaction->id) }}" method="POST" style="display:inline" class="markPaidForm" data-product-name="{{ $transaction->product_name ?? 'Unknown' }}">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3" title="Tandai Semua Dibayar">
                                 <i class="ti ti-wallet"></i>
@@ -105,7 +105,7 @@
                         </form>
                         @endif
 
-                        <form action="{{ route('transactions.destroy', $transaction->transaction_id) }}" method="POST" style="display:inline" onsubmit="return confirm('Hapus transaksi ini?');">
+                        <form action="{{ route('transactions.destroy', $transaction->transaction_id) }}" method="POST" style="display:inline" class="deleteTransactionForm" data-product-name="{{ $transaction->product_name ?? 'Unknown' }}">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
@@ -137,7 +137,69 @@
         {{ $transactions->links() }}
     </div>
 </div>
-@endif  
+@endif
+
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const markPaidForms = document.querySelectorAll('.markPaidForm');
+    const deleteTransactionForms = document.querySelectorAll('.deleteTransactionForm');
+
+    markPaidForms.forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const productName = form.getAttribute('data-product-name');
+
+            Swal.fire({
+                title: 'Tandai Sebagai Dibayar?',
+                html: `
+                    <p>Apakah Anda yakin ingin menandai semua transaksi pending untuk produk:</p>
+                    <p style="font-weight: bold; color: #0d6efd;">${productName}</p>
+                    <p style="font-size: 12px;">sebagai sudah dibayar?</p>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Tandai',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    deleteTransactionForms.forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const productName = form.getAttribute('data-product-name');
+
+            Swal.fire({
+                title: 'Hapus Transaksi?',
+                html: `
+                    <p>Apakah Anda yakin ingin menghapus transaksi untuk produk:</p>
+                    <p style="font-weight: bold; color: #0d6efd;">${productName}</p>
+                    <p style="font-size: 12px; color: #dc3545;"><i class="ti ti-alert-circle"></i> Tindakan ini tidak dapat dibatalkan</p>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
 
 <style>
 /* Compact pagination styling */

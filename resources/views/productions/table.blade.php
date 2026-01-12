@@ -81,7 +81,9 @@
 
                         <form action="{{ route('production.destroy', $production->production_id) }}"
                               method="POST"
-                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus production ini? Stok material TIDAK akan dikembalikan.');">
+                              style="display:inline"
+                              class="deleteProductionForm"
+                              data-production-label="{{ $production->production_label }}">
                             @csrf
                             @method('DELETE')
                             <button type="submit"
@@ -165,3 +167,40 @@
     </div>
 </div>
 @endif
+
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteProductionForms = document.querySelectorAll('.deleteProductionForm');
+
+    deleteProductionForms.forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const productionLabel = form.getAttribute('data-production-label');
+
+            Swal.fire({
+                title: 'Hapus Produksi?',
+                html: `
+                    <p>Apakah Anda yakin ingin menghapus produksi:</p>
+                    <p style="font-weight: bold; color: #0d6efd;">${productionLabel}</p>
+                    <p style="font-size: 12px; color: #dc3545;"><i class="ti ti-alert-circle"></i> Stok material TIDAK akan dikembalikan</p>
+                    <p style="font-size: 12px; color: #dc3545;"><i class="ti ti-alert-circle"></i> Tindakan ini tidak dapat dibatalkan</p>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
+</div>

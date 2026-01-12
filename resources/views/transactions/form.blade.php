@@ -90,7 +90,7 @@
                         </div>
                     </div>
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
                             <i class="ti ti-cloud-upload"></i> Simpan Transaksi
                         </button>
                     </div>
@@ -102,6 +102,85 @@
         </form>
     </div>
 </div>
+
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('transactionForm');
+
+    @if(session('success'))
+        Swal.fire({
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            icon: 'success',
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '{{ route('transactions.index') }}';
+            }
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            icon: 'error',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'OK'
+        });
+    @endif
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const total = document.getElementById('cartTotal').value;
+        const cartItemsHidden = document.querySelectorAll('#itemsContainer input[type="hidden"]');
+        
+        // Check if cart has items by counting hidden inputs (each item has 2 hidden inputs)
+        const itemCount = cartItemsHidden.length / 2;
+
+        if (itemCount === 0) {
+            Swal.fire({
+                title: 'Keranjang Kosong',
+                text: 'Tambahkan produk ke keranjang terlebih dahulu',
+                icon: 'warning',
+                confirmButtonColor: '#0d6efd',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Konfirmasi Simpan Transaksi',
+            html: `
+                <div style="text-align: left; margin: 20px 0;">
+                    <p><strong>Total Transaksi:</strong> Rp ${parseInt(total).toLocaleString('id-ID')}</p>
+                    <p><strong>Jumlah Produk:</strong> ${itemCount}</p>
+                </div>
+            `,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Simpan',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+});
+</script>
 
 @php
     // Prefer server-provided $availableProducts (should contain only products that passed QC).

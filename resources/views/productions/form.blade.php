@@ -106,13 +106,78 @@
                 <button type="reset" class="btn btn-outline-secondary px-4">
                     <i class="ti ti-refresh"></i> Reset
                 </button>
-                <button type="submit" class="btn btn-primary px-5 shadow-sm">
+                <button type="submit" class="btn btn-primary px-5 shadow-sm" id="submitBtn">
                     <i class="ti ti-cloud-upload"></i> Simpan Produksi
                 </button>
             </div>
         </div>
     </div>
 </form>
+
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('productionForm');
+
+    @if(session('success'))
+        Swal.fire({
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            icon: 'success',
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '{{ route('production.index') }}';
+            }
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            icon: 'error',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'OK'
+        });
+    @endif
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const productionLabel = document.querySelector('input[name="production_label"]').value;
+        const productionLead = document.querySelector('input[name="production_lead"]').value;
+
+        Swal.fire({
+            title: 'Konfirmasi Tambah Produksi',
+            html: `
+                <div style="text-align: left; margin: 20px 0;">
+                    <p><strong>Label:</strong> ${productionLabel}</p>
+                    <p><strong>Kepala Tim:</strong> ${productionLead}</p>
+                </div>
+            `,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Simpan',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+});
+</script>
 
 <script>
 let materialIndex = 0;

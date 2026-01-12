@@ -68,7 +68,9 @@
                         </a>
                         <form action="{{ route('qc_check.destroy', $qc->qc_id) }}"
                               method="POST"
-                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                              style="display:inline"
+                              class="deleteQCForm"
+                              data-product-name="{{ $qc->detailProduct->product_name ?? 'Unknown' }}">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
@@ -99,3 +101,38 @@
     </div>
 </div>
 @endif
+
+{{-- SweetAlert CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteQCForms = document.querySelectorAll('.deleteQCForm');
+
+    deleteQCForms.forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const productName = form.getAttribute('data-product-name');
+
+            Swal.fire({
+                title: 'Hapus QC Check?',
+                html: `
+                    <p>Apakah Anda yakin ingin menghapus QC untuk produk:</p>
+                    <p style="font-weight: bold; color: #0d6efd;">${productName}</p>
+                    <p style="font-size: 12px; color: #dc3545;"><i class="ti ti-alert-circle"></i> Tindakan ini tidak dapat dibatalkan</p>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
