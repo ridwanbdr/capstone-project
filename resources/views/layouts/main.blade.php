@@ -215,6 +215,22 @@
           </ul>
           <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
             <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+              <li class="nav-item d-none d-lg-flex align-items-center me-3">
+                <div class="text-end">
+                  <p class="mb-0 fw-semibold text-dark">{{ Auth::user()->nama_lengkap ?? Auth::user()->name }}</p>
+                  <small class="text-muted">
+                    @if(Auth::user()->isAdmin())
+                      Administrator
+                    @elseif(Auth::user()->isStaffOperasional())
+                      Staff Operasional
+                    @elseif(Auth::user()->isQcStaff())
+                      QC Staff
+                    @else
+                      User
+                    @endif
+                  </small>
+                </div>
+              </li>
               <li class="nav-item dropdown">
                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
                   aria-expanded="false">
