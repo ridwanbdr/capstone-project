@@ -186,7 +186,8 @@ class TransactionController extends Controller
         $transaction = Transaction::findOrFail($transaction_id);
         $availStocks = AvailStock::orderBy('id')->get();
         $sizes = Size::orderBy('size_id')->get();
-        return view('transactions.form', compact('transaction', 'availStocks', 'sizes'));
+        // Use dedicated edit view so editing is done on its own page (no modal)
+        return view('transactions.edit', compact('transaction', 'availStocks', 'sizes'));
     }
 
     public function update(Request $request, $transaction_id)

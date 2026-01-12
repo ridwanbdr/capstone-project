@@ -89,22 +89,11 @@
 
                 <td class="text-center">
                     <div class="d-flex gap-2 justify-content-center">
-                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 edit-transaction-btn" 
-                            data-transaction-id="{{ $transaction->transaction_id }}"
-                            data-id="{{ $transaction->id }}"
-                            data-date="{{ optional($transaction->date)->format('Y-m-d') }}"
-                            data-product-name="{{ $transaction->product_name }}"
-                            data-qty="{{ $transaction->qty }}"
-                            data-size="{{ $transaction->size }}"
-                            data-price="{{ $transaction->price }}"
-                            data-paid="{{ $transaction->paid }}"
-                            data-payment-method="{{ $transaction->payment_method }}"
-                            data-due-date="{{ optional($transaction->due_date_payment)->format('Y-m-d') }}"
-                            data-status="{{ $transaction->status }}"
-                            data-bs-toggle="modal" 
-                            data-bs-target="#editModal">
+                        {{-- Edit now navigates to dedicated edit page --}}
+                        <a href="{{ route('transactions.edit', $transaction->transaction_id) }}"
+                           class="btn btn-sm btn-outline-primary rounded-pill px-3">
                             <i class="ti ti-edit"></i>
-                        </button>
+                        </a>
 
                         {{-- Bulk mark pending for this product as paid --}}
                         @if($transaction->id)
@@ -149,153 +138,6 @@
     </div>
 </div>
 @endif  
-
-{{-- Reusable Edit Modal --}}
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-primary border-0">
-                <h5 class="modal-title fw-semibold text-white" id="editModalLabel">Edit Transaksi</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form id="editForm" method="POST">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Tanggal</label>
-                        <input type="date" class="form-control" id="date" disabled>
-                        <input type="hidden" name="date" id="dateHidden">
-                    </div>
-
-                    <input type="hidden" name="id" id="transactionId">
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Nama Produk</label>
-                        <input type="text" name="product_name" id="productName" class="form-control" readonly>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Quantity</label>
-                            <input type="number" name="qty" id="qty" class="form-control" min="1" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Ukuran</label>
-                            <input type="text" name="size" id="size" class="form-control" readonly>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Harga Satuan (Rp)</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light">Rp</span>
-                            <input type="text" name="price" id="price" class="form-control" readonly>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Paid (Rp)</label>
-                        <input type="text" name="paid" id="paid" class="form-control">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Payment Method</label>
-                        <input type="text" name="payment_method" id="paymentMethod" class="form-control">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Due Date Payment</label>
-                        <input type="date" name="due_date_payment" id="dueDate" class="form-control">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Status</label>
-                        <input type="text" name="status" id="status" class="form-control">
-                    </div>
-
-                    <div class="modal-footer border-0 pt-3">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle edit modal population
-    const editButtons = document.querySelectorAll('.edit-transaction-btn');
-    
-    editButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const form = document.getElementById('editForm');
-            const transactionId = this.getAttribute('data-transaction-id');
-            const id = this.getAttribute('data-id');
-            
-            // Update form action URL
-            form.action = '{{ route("transactions.update", ":id") }}'.replace(':id', transactionId);
-            
-            // Populate form fields
-            document.getElementById('transactionId').value = id;
-            document.getElementById('date').value = this.getAttribute('data-date');
-            document.getElementById('dateHidden').value = this.getAttribute('data-date');
-            document.getElementById('productName').value = this.getAttribute('data-product-name');
-            document.getElementById('qty').value = this.getAttribute('data-qty');
-            document.getElementById('size').value = this.getAttribute('data-size');
-            document.getElementById('price').value = this.getAttribute('data-price');
-            document.getElementById('paid').value = this.getAttribute('data-paid');
-            document.getElementById('paymentMethod').value = this.getAttribute('data-payment-method');
-            document.getElementById('dueDate').value = this.getAttribute('data-due-date');
-            document.getElementById('status').value = this.getAttribute('data-status');
-        });
-    });
-    
-    // Handle form submission
-    const editForm = document.getElementById('editForm');
-    editForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Disable submit button to prevent double submission
-        const submitBtn = editForm.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Menyimpan...';
-        
-        fetch(editForm.action, {
-            method: 'POST',
-            body: new FormData(editForm),
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                // Close modal and reload page on success
-                const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-                modal.hide();
-                
-                // Show success message and reload
-                setTimeout(() => {
-                    location.reload();
-                }, 500);
-            } else {
-                alert('Terjadi kesalahan saat menyimpan data');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Simpan';
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Terjadi kesalahan saat menyimpan data');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Simpan';
-        });
-    });
-});
-</script>
 
 <style>
 /* Compact pagination styling */

@@ -59,12 +59,11 @@
                 </td>
                 <td class="text-center">
                     <div class="d-flex justify-content-center gap-2">
-                        <button type="button"
-                                class="btn btn-sm btn-outline-primary rounded-pill px-3"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editModal{{ $item->product_id }}">
+                        {{-- Edit now navigates to dedicated edit page --}}
+                        <a href="{{ route('detail_product.edit', $item->product_id) }}"
+                           class="btn btn-sm btn-outline-primary rounded-pill px-3">
                             <i class="ti ti-edit"></i>
-                        </button>
+                        </a>
 
                         <form action="{{ route('detail_product.destroy', ['detail_product' => $item->product_id]) }}"
                               method="POST"
@@ -79,75 +78,6 @@
                     </div>
                 </td>
             </tr>
-
-            {{-- Modal Edit --}}
-            <div class="modal fade" id="editModal{{ $item->product_id }}" tabindex="-1" aria-labelledby="editModalLabel{{ $item->product_id }}" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
-                    <div class="modal-content border-0 shadow-lg">
-                        <div class="modal-header bg-primary border-0">
-                            <h5 class="modal-title text-white fw-semibold" id="editModalLabel{{ $item->product_id }}">
-                                <i class="ti ti-edit me-2"></i>Edit Detail Product
-                            </h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body p-4">
-                            <form action="{{ route('detail_product.update', ['detail_product' => $item->product_id]) }}" method="POST" id="editForm{{ $item->product_id }}">
-                                @csrf
-                                @method('PUT')
-
-                                {{-- Production ID (readonly shown, submitted via hidden input) --}}
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Production ID</label>
-                                    <div class="form-control-plaintext">{{ $item->production_id }}</div>
-                                    <input type="hidden" name="production_id" value="{{ $item->production_id }}">
-                                </div>
-
-                                {{-- Production Label (readonly display only; not submitted since column removed) --}}
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Production Label</label>
-                                    <div class="form-control-plaintext">{{ $item->production->production_label ?? '-' }}</div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Product Name</label>
-                                    <input name="product_name" required type="text" class="form-control" value="{{ old('product_name', $item->product_name) }}">
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Size</label>
-                                    <select name="size_id" class="form-select" required>
-                                        <option value="">-- Pilih ukuran --</option>
-                                        @foreach($sizes ?? collect() as $size)
-                                            <option value="{{ $size->size_id }}" {{ $item->size_id == $size->size_id ? 'selected' : '' }}>
-                                                {{ $size->size_label }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Qty Unit</label>
-                                    <input name="qty_unit" type="number" min="0" class="form-control" value="{{ old('qty_unit', $item->qty_unit) }}">
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Price Unit</label>
-                                    <input name="price_unit" type="number" min="0" class="form-control" value="{{ old('price_unit', $item->price_unit) }}">
-                                </div>
-
-                                <div class="modal-footer border-0 pt-3">
-                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                        <i class="ti ti-x"></i> Batal
-                                    </button>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="ti ti-device-floppy"></i> Simpan
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {{-- Modal View (readonly) --}}
             <div class="modal fade" id="viewModal{{ $item->product_id }}" tabindex="-1" aria-labelledby="viewModalLabel{{ $item->product_id }}" aria-hidden="true">
