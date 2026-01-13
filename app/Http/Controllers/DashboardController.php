@@ -208,7 +208,7 @@ class DashboardController extends Controller
     private function getLatestRawStocks()
     {
         return RawStock::orderBy('added_on', 'desc')
-            ->take(4)
+            ->take(8)
             ->get()
             ->map(function ($stock) {
                 return [

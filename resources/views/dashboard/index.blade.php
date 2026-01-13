@@ -172,9 +172,9 @@
                         <th class="border-bottom-0 text-end">
                           <h6 class="fw-semibold mb-0">Harga Satuan</h6>
                         </th>
-                        <th class="border-bottom-0 text-end">
+                        {{-- <th class="border-bottom-0 text-end">
                           <h6 class="fw-semibold mb-0">Total Harga</h6>
-                        </th>                        
+                        </th>                         --}}
                       </tr>
                     </thead>
                     <tbody>
@@ -189,9 +189,9 @@
                         <td class="border-bottom-0 text-end">
                           <p class="mb-0 fw-normal">{{ $stock['formatted_price'] }}</p>
                         </td>
-                        <td class="border-bottom-0 text-end">
+                        {{-- <td class="border-bottom-0 text-end">
                           <h6 class="fw-semibold mb-0 fs-4">{{ $stock['formatted_total'] }}</h6>
-                        </td>
+                        </td> --}}
                       </tr>
                       @empty
                       <tr>
