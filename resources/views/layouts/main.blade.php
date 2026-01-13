@@ -276,6 +276,11 @@
   <script src="{{ asset('assets/js/dashboard.js') }}"></script>
   @stack('scripts')
   <style>
+    
+    .body-wrapper {
+      background-color: #fafafa;
+    }
+
     /* Global Card Styling - Visible Borders and Hover Effects */
     .card {
       border: 1px solid #e0e0e0 !important;

@@ -140,7 +140,7 @@
                 <h5 class="card-title fw-semibold mb-1">
                   <i class="ti ti-pie-chart me-2 text-info"></i>Produk Terlaris
                 </h5>
-                <small class="text-muted">Distribusi berdasarkan total penjualan</small>
+                <small class="text-muted">Distribusi berdasarkan hasil penjualan</small>
               </div>
               <div class="card-body p-4">
                 <div id="productionChart" style="height: 350px;"></div>
